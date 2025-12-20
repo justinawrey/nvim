@@ -34,7 +34,10 @@ vim.diagnostic.config({
 
 -- Make the autocomplete usable, otherwise the first menu item
 -- is auto-selected which fucking sucks.
-vim.cmd("set completeopt+=noselect")
+vim.cmd('set completeopt+=noselect')
+
+-- Put the absolute path of the current file in the winbar.
+vim.cmd('set winbar=%F')
 
 -- Rounded diagnostic window borders that are easier to see.
 vim.o.winborder = 'rounded'
