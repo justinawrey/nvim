@@ -15,6 +15,11 @@ return {
   },
   opts = {
     filesystem = {
+      filtered_items = {
+        hide_by_pattern = {
+          '*.meta',
+        },
+      },
       follow_current_file = {
         enabled = true,
         leave_dirs_open = false,
