@@ -205,6 +205,9 @@ vim.opt.winbar = "%{v:lua.git_root_relative_filename()} %{v:lua.buffer_git_statu
 -- Use retrobox colorscheme.
 vim.cmd 'colorscheme retrobox'
 
--- Custom plugins!
+-- Gitsigns, for nice info in the left sidebar and change counts.
 require('plugins.gitsigns')
+
+-- Oil, for file editing like a buffer.
+---@diagnostic disable-next-line: different-requires
 require('plugins.oil')
