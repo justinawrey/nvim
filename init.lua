@@ -206,8 +206,8 @@ vim.opt.winbar = "%{v:lua.git_root_relative_filename()} %{v:lua.buffer_git_statu
 vim.cmd 'colorscheme retrobox'
 
 -- Gitsigns, for nice info in the left sidebar and change counts.
-require('plugins.gitsigns')
+require('plug.gitsigns')
 
 -- Oil, for file editing like a buffer.
----@diagnostic disable-next-line: different-requires
-require('plugins.oil')
+---@diagnostic disable: different-requires
+require('plug.oil')
