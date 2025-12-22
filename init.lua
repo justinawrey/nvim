@@ -77,6 +77,21 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><Esc>')
 -- Exit terminal mode with jj.
 vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
 
+-- Open oil in parent dir.
+vim.keymap.set('n', '-', '<CMD>Oil --float<CR>')
+
+-- Open oil in git repo root.
+vim.keymap.set("n", "<C-->", function()
+  local root = vim.fs.find(".git", { upward = true })[1]
+  if not root then
+    vim.notify("Not inside a git repo", vim.log.levels.WARN)
+    return
+  end
+
+  root = vim.fs.dirname(root)
+  require("oil").open_float(root)
+end)
+
 -- Lua language server config.
 vim.lsp.config['luals'] = {
   cmd = { 'lua-language-server' },
