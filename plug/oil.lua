@@ -1,4 +1,6 @@
-require('oil').setup({
+local oil = require('oil')
+
+oil.setup({
   view_options = {
     show_hidden = true,
   },
@@ -7,3 +9,5 @@ require('oil').setup({
     max_height = 0.7
   }
 })
+
+return oil

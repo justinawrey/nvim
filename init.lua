@@ -1,3 +1,9 @@
+-- Gitsigns, for nice info in the left sidebar and change counts.
+require('plug.gitsigns')
+
+-- Oil, for file editing like a buffer.
+require('plug.oil')
+
 -- Get line numbers.
 vim.opt.number = true
 
@@ -24,6 +30,19 @@ vim.cmd 'set completeopt+=noselect'
 
 -- Force a global statusbar.
 vim.cmd 'set laststatus=3'
+
+-- A highlight group for bold status line characters.
+vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
+
+-- Set a statusline that looks like the following:
+-- nvim (main) [~/.config/nvim/v2]     10/100 (10%)
+vim.opt.statusline = "%#StatusLineBold#%{v:lua.git_repo()}%* [%{v:lua.cwd_short()}] %= %l/%L (%p%%)"
+
+-- Put the absolute path of the current file in the winbar.
+vim.opt.winbar = "%{v:lua.git_root_relative_filename()} %{v:lua.buffer_git_status()}"
+
+-- Use retrobox colorscheme.
+vim.cmd 'colorscheme retrobox'
 
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config {
@@ -89,7 +108,7 @@ vim.keymap.set("n", "<C-->", function()
   end
 
   root = vim.fs.dirname(root)
-  require("oil").open_float(root)
+  require("plug.oil").open_float(root)
 end)
 
 -- Lua language server config.
@@ -191,23 +210,3 @@ function _G.buffer_git_status()
 
   return '[' .. status .. ']'
 end
-
--- A highlight group for bold status line characters.
-vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
-
--- Set a statusline that looks like the following:
--- nvim (main) [~/.config/nvim/v2]     10/100 (10%)
-vim.opt.statusline = "%#StatusLineBold#%{v:lua.git_repo()}%* [%{v:lua.cwd_short()}] %= %l/%L (%p%%)"
-
--- Put the absolute path of the current file in the winbar.
-vim.opt.winbar = "%{v:lua.git_root_relative_filename()} %{v:lua.buffer_git_status()}"
-
--- Use retrobox colorscheme.
-vim.cmd 'colorscheme retrobox'
-
--- Gitsigns, for nice info in the left sidebar and change counts.
-require('plug.gitsigns')
-
--- Oil, for file editing like a buffer.
----@diagnostic disable: different-requires
-require('plug.oil')
