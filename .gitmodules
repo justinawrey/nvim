@@ -1,0 +1,3 @@
+[submodule "pack/oil/start/oil"]
+	path = pack/oil/start/oil
+	url = https://github.com/stevearc/oil.nvim
