@@ -4,3 +4,9 @@
 [submodule "pack/gitsigns/start/gitsigns"]
 	path = pack/gitsigns/start/gitsigns
 	url = https://github.com/lewis6991/gitsigns.nvim
+[submodule "snacks.nvim"]
+	path = snacks.nvim
+	url = https://github.com/folke/snacks.nvim
+[submodule "pack/snacks/start/snacks"]
+	path = pack/snacks/start/snacks
+	url = https://github.com/folke/snacks.nvim

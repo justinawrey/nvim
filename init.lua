@@ -1,3 +1,17 @@
+-- Add the config path to package.path so I can relatively
+-- require like: require('plug.some-plug').
+-- Feels weird, idk if this is the right, but whatever, it works.
+-- Might act weirdly if init files are somewhere other than
+-- the standard config paths but... w/e
+package.path = vim.fn.stdpath('config') .. '/?.lua;' .. package.path
+
+-- Space leader.
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
+-- Snacks, but only for the picker.
+require('plug.snacks')
+
 -- Gitsigns, for nice info in the left sidebar and change counts.
 require('plug.gitsigns')
 
@@ -22,7 +36,7 @@ vim.opt.winborder = 'rounded'
 vim.opt.clipboard = 'unnamedplus'
 
 -- Disable keystroke flashing in the bottom right.
-vim.opt.showcmd = false
+vim.opt.showcmd = true
 
 -- Make the autocomplete usable, otherwise the first menu item
 -- is auto-selected which fucking sucks.
@@ -34,9 +48,12 @@ vim.cmd 'set laststatus=3'
 -- A highlight group for bold status line characters.
 vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
 
--- Set a statusline that looks like the following:
--- nvim (main) [~/.config/nvim/v2]     10/100 (10%)
-vim.opt.statusline = "%#StatusLineBold#%{v:lua.git_repo()}%* [%{v:lua.cwd_short()}] %= %l/%L (%p%%)"
+
+-- Statusline. Does async stuff to try and keep it fast.
+-- TODO: Why bolding no work?
+-- TODO: both the winbar and statusbars dont work well with submodules.
+vim.opt.statusline =
+"[%{v:lua.cwd_short()}] %#StatusLineBold#%{v:lua.git_repo()}%#StatusLine# %= %l/%L (%p%%)"
 
 -- Put the absolute path of the current file in the winbar.
 vim.opt.winbar = "%{v:lua.git_root_relative_filename()} %{v:lua.buffer_git_status()}"
@@ -67,8 +84,8 @@ vim.keymap.set({ 'i', 'c' }, '<C-j>', '<C-n>')
 vim.keymap.set({ 'i', 'c' }, '<C-k>', '<C-p>')
 
 -- Jump up and down by chunked amounts.
-vim.keymap.set('n', '<S-j>', '8j')
-vim.keymap.set('n', '<S-k>', '8k')
+vim.keymap.set({ 'n', 'v' }, '<S-j>', '8j')
+vim.keymap.set({ 'n', 'v' }, '<S-k>', '8k')
 
 -- Lsp format the current buffer.
 vim.keymap.set('n', 'ff', vim.lsp.buf.format)
@@ -96,8 +113,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><Esc>')
 -- Exit terminal mode with jj.
 vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
 
--- Open oil in parent dir.
-vim.keymap.set('n', '-', '<CMD>Oil --float<CR>')
+-- Open oil in cwd.
+vim.keymap.set('n', '-', '<CMD>Oil --float .<CR>')
 
 -- Open oil in git repo root.
 vim.keymap.set("n", "<C-->", function()
@@ -141,36 +158,48 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- Attempts to find git repo. Returns nil if not parent dir
--- could be find with a .git folder.
+-- Returns a formatted short string describing git repo root
+-- and current HEAD. Uses buffer variables populated from gitsigns.
+-- Do a nil check first, because if no buffers are open the dictionary
+-- will not have been populated.
 function _G.git_repo()
-  local git_dir = vim.fn.finddir(".git", vim.fn.getcwd() .. ";")
-
-  if git_dir == "" then
-    return 'no git'
+  if not vim.b.gitsigns_status_dict then
+    return ''
   end
 
-  -- When cwd is the root of the git repo, handle it as a special
-  -- case. There is probably a more elegant way to do this.
-  local repo
-  if git_dir == ".git" then
-    repo = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
-  else
-    repo = vim.fn.fnamemodify(git_dir, ":h:t")
+  local head = vim.b.gitsigns_status_dict and vim.b.gitsigns_status_dict.head
+  local root = vim.b.gitsigns_status_dict and vim.b.gitsigns_status_dict.root
+
+  local cwd_rel_to_git_root = vim.fs.relpath(vim.b.gitsigns_status_dict.root, vim.loop.cwd())
+  local cwd_child_of_git_root = cwd_rel_to_git_root ~= nil
+
+  if cwd_child_of_git_root then
+    return vim.fs.basename(root) .. ' (' .. head .. ')'
   end
 
-  local branch = vim.fn.systemlist('git branch --show-current')[1]
-  return string.format('%s (%s)', repo, branch)
+  return 'no git'
 end
 
 -- Get a version of cwd that uses ~ instead of the expanded name.
+-- TODO: vim.loop is deprecated.
 function _G.cwd_short()
-  local cwd = vim.fn.getcwd()
+  local cwd = vim.loop.cwd()
   local home = vim.loop.os_homedir()
 
   -- replace home path with ~
   cwd = cwd:gsub("^" .. home, "~")
   return cwd
+end
+
+-- Returns a string suitable for a statusline containing
+-- a git change summation.
+-- ex: [+30 ~27 -17].
+function _G.buffer_git_status()
+  if vim.b.gitsigns_status == '' or vim.b.gitsigns_status == nil then
+    return ''
+  end
+
+  return '[' .. vim.b.gitsigns_status .. ']'
 end
 
 -- Get the path, relative to the git root, of the file
@@ -181,32 +210,10 @@ function _G.git_root_relative_filename()
     return 'terminal'
   end
 
-  local git_dir = vim.fn.finddir(".git", vim.fn.getcwd() .. ";")
-  local file_abs = vim.fn.expand("%:p")
-
-  if git_dir == nil or git_dir == "" then
-    local home = vim.loop.os_homedir()
-    return file_abs:gsub("^" .. home, "~")
+  local file_abs = vim.api.nvim_buf_get_name(0)
+  if vim.b.gitsigns_status_dict and vim.b.gitsigns_status_dict.root then
+    return file_abs:sub(#vim.b.gitsigns_status_dict.root + 2)
   end
 
-  if git_dir == ".git" then
-    git_dir = vim.fn.getcwd()
-  else
-    git_dir = vim.fn.fnamemodify(git_dir, ":h")
-  end
-
-  return file_abs:sub(#git_dir + 2)
-end
-
-function _G.buffer_git_status()
-  local status = vim.b.gitsigns_status
-  if status == nil then
-    return ""
-  end
-
-  if status == "" then
-    return ""
-  end
-
-  return '[' .. status .. ']'
+  return file_abs
 end
