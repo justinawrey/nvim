@@ -298,7 +298,11 @@ function _G.buffer_git_status()
     table.insert(parts, '%#GitSignsDelete#' .. '-' .. removed .. '%#WinBar#')
   end
 
-  return '[' .. table.concat(parts, ' ') .. ']'
+  if added > 0 or changed > 0 or removed > 0 then
+    return '[' .. table.concat(parts, ' ') .. ']'
+  end
+
+  return ''
 end
 
 -- Get the path, relative to the git root, of the file
