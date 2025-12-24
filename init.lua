@@ -10,14 +10,19 @@ vim.keymap.set('n', '<space>', '<nop>')
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Snacks, but only for the picker.
+-- Gotta install all of the snacks package,
+-- but we are only enabling the picker.
 require('plug.snacks')
 
 -- Gitsigns, for nice info in the left sidebar and change counts.
+-- TODO: still need to set up hunk stage/unstage/preview/reset keybindings.
 require('plug.gitsigns')
 
--- Oil, for file editing like a buffer.
+-- Everything is buffer!
 require('plug.oil')
+
+-- Without this, typing sucks ass.
+require('plug.autopairs')
 
 -- Get line numbers.
 vim.opt.number = true
