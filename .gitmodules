@@ -7,3 +7,6 @@
 [submodule "pack/snacks/start/snacks"]
 	path = pack/snacks/start/snacks
 	url = https://github.com/folke/snacks.nvim
+[submodule "pack/autopairs/start/autopairs"]
+	path = pack/autopairs/start/autopairs
+	url = https://github.com/windwp/nvim-autopairs
