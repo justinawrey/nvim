@@ -1,0 +1,12 @@
+[submodule "pack/snacks/start/snacks"]
+	path = pack/snacks/start/snacks
+	url = https://github.com/folke/snacks.nvim.git
+[submodule "pack/oil/start/oil"]
+	path = pack/oil/start/oil
+	url = https://github.com/stevearc/oil.nvim
+[submodule "pack/autopairs/start/autopairs"]
+	path = pack/autopairs/start/autopairs
+	url = https://github.com/windwp/nvim-autopairs.git
+[submodule "pack/gitsigns/start/gitsigns"]
+	path = pack/gitsigns/start/gitsigns
+	url = https://github.com/lewis6991/gitsigns.nvim.git
