@@ -10,3 +10,6 @@
 [submodule "pack/gitsigns/start/gitsigns"]
 	path = pack/gitsigns/start/gitsigns
 	url = https://github.com/lewis6991/gitsigns.nvim.git
+[submodule "pack/blink/start/blink"]
+	path = pack/blink/start/blink
+	url = https://github.com/saghen/blink.cmp.git
