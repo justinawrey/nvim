@@ -1,11 +1,12 @@
+-- This one is kinda complicated, so yoinked straight outta lspconfig.
 local uv = vim.uv
 local fs = vim.fs
 
-local group = vim.api.nvim_create_augroup('lspconfig.roslyn_ls', { clear = true })
+local group = vim.api.nvim_create_augroup('lspconfig.roslyn', { clear = true })
 
 ---@param target string
 local function on_init_sln(client, target)
-  vim.notify('Initializing: ' .. target, vim.log.levels.TRACE, { title = 'roslyn_ls' })
+  vim.notify('Initializing: ' .. target, vim.log.levels.TRACE, { title = 'roslyn' })
   ---@diagnostic disable-next-line: param-type-mismatch
   client:notify('solution/open', {
     solution = vim.uri_from_fname(target),
@@ -14,7 +15,7 @@ end
 
 ---@param project_files string[]
 local function on_init_project(client, project_files)
-  vim.notify('Initializing: projects', vim.log.levels.TRACE, { title = 'roslyn_ls' })
+  vim.notify('Initializing: projects', vim.log.levels.TRACE, { title = 'roslyn' })
   ---@diagnostic disable-next-line: param-type-mismatch
   client:notify('project/open', {
     projects = vim.tbl_map(function(file)
@@ -39,7 +40,7 @@ end
 local function roslyn_handlers()
   return {
     ['workspace/projectInitializationComplete'] = function(_, _, ctx)
-      vim.notify('Roslyn project initialization complete', vim.log.levels.INFO, { title = 'roslyn_ls' })
+      vim.notify('Roslyn project initialization complete', vim.log.levels.INFO, { title = 'roslyn' })
       local client = assert(vim.lsp.get_client_by_id(ctx.client_id))
       refresh_diagnostics(client)
       return vim.NIL
@@ -50,11 +51,11 @@ local function roslyn_handlers()
       ---@diagnostic disable-next-line: param-type-mismatch
       client:request('workspace/_roslyn_restore', result, function(err, response)
         if err then
-          vim.notify(err.message, vim.log.levels.ERROR, { title = 'roslyn_ls' })
+          vim.notify(err.message, vim.log.levels.ERROR, { title = 'roslyn' })
         end
         if response then
           for _, v in ipairs(response) do
-            vim.notify(v.message, vim.log.levels.INFO, { title = 'roslyn_ls' })
+            vim.notify(v.message, vim.log.levels.INFO, { title = 'roslyn' })
           end
         end
       end)
@@ -65,22 +66,22 @@ local function roslyn_handlers()
       vim.notify(
         'Razor is not supported.\nPlease use https://github.com/tris203/rzls.nvim',
         vim.log.levels.WARN,
-        { title = 'roslyn_ls' }
+        { title = 'roslyn' }
       )
       return vim.NIL
     end,
   }
 end
 
-vim.lsp.config['roslyn_ls'] = {
-  name = 'roslyn_ls',
+vim.lsp.config['roslyn'] = {
+  name = 'roslyn',
   offset_encoding = 'utf-8',
   cmd = {
     'Microsoft.CodeAnalysis.LanguageServer',
     '--logLevel',
     'Information',
     '--extensionLogDirectory',
-    fs.joinpath(uv.os_tmpdir(), 'roslyn_ls/logs'),
+    fs.joinpath(uv.os_tmpdir(), 'roslyn/logs'),
     '--stdio',
   },
   filetypes = { 'cs' },
@@ -107,7 +108,7 @@ vim.lsp.config['roslyn_ls'] = {
         vim.lsp.util.apply_workspace_edit(workspace_edit, client.offset_encoding)
       ---@diagnostic enable: undefined-field
       else
-        vim.notify('roslyn_ls: completionComplexEdit args not understood: ' .. vim.inspect(args), vim.log.levels.WARN)
+        vim.notify('roslyn: completionComplexEdit args not understood: ' .. vim.inspect(args), vim.log.levels.WARN)
       end
     end,
   },
@@ -136,7 +137,7 @@ vim.lsp.config['roslyn_ls'] = {
       -- Decompiled code (example: "/tmp/MetadataAsSource/f2bfba/DecompilationMetadataAsSourceFileProvider/d5782a/Console.cs")
       local prev_buf = vim.fn.bufnr('#')
       local client = vim.lsp.get_clients({
-        name = 'roslyn_ls',
+        name = 'roslyn',
         bufnr = prev_buf ~= 1 and prev_buf or nil,
       })[1]
       if client then
@@ -177,7 +178,7 @@ vim.lsp.config['roslyn_ls'] = {
       callback = function()
         refresh_diagnostics(client)
       end,
-      desc = 'roslyn_ls: refresh diagnostics',
+      desc = 'roslyn: refresh diagnostics',
     })
   end,
 
@@ -222,4 +223,4 @@ vim.lsp.config['roslyn_ls'] = {
   },
 }
 
-vim.lsp.enable('roslyn_ls')
+vim.lsp.enable('roslyn')
