@@ -1,17 +1,49 @@
+local function relative_path(from, to)
+  from = vim.fs.normalize(from)
+  to = vim.fs.normalize(to)
+
+  -- split paths
+  local function split(p)
+    return vim.split(p, '/', { plain = true, trimempty = true })
+  end
+
+  local from_parts = split(from)
+  local to_parts = split(to)
+
+  -- remove common prefix
+  local i = 1
+  while from_parts[i] and to_parts[i] and from_parts[i] == to_parts[i] do
+    i = i + 1
+  end
+
+  local rel = {}
+
+  -- go up for remaining `from` parts
+  for _ = i, #from_parts do
+    table.insert(rel, '..')
+  end
+
+  -- go down into `to`
+  for j = i, #to_parts do
+    table.insert(rel, to_parts[j])
+  end
+
+  return #rel > 0 and table.concat(rel, '/') or '.'
+end
+
+--
 -- Get the path, relative to the git root, of the file
 -- open in the current buffer. If a parent git repo cannot
 -- be found, return the absolute path of the file.
-function _G.git_root_relative_filename()
+function _G.relative_filename()
   if vim.bo.buftype == 'terminal' then
     return 'terminal'
   end
 
   local file_abs = vim.api.nvim_buf_get_name(0)
-  if vim.b.gitsigns_status_dict and vim.b.gitsigns_status_dict.root then
-    return file_abs:sub(#vim.b.gitsigns_status_dict.root + 2)
-  end
+  local cwd_abs = vim.loop.cwd()
 
-  return file_abs
+  return relative_path(cwd_abs, file_abs)
 end
 
 -- Returns a string suitable for a statusline containing
@@ -71,4 +103,4 @@ function _G.diagnostics_summary()
 end
 
 -- Put the absolute path of the current file in the winbar.
-vim.opt.winbar = '%{v:lua.git_root_relative_filename()} %{%v:lua.buffer_git_status()%} %{%v:lua.diagnostics_summary()%}'
+vim.opt.winbar = '%{v:lua.relative_filename()} %{%v:lua.buffer_git_status()%} %{%v:lua.diagnostics_summary()%}'

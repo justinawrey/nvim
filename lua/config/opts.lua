@@ -43,7 +43,7 @@ vim.opt.swapfile = false
 -- Force a global statusbar.
 vim.opt.laststatus = 3
 
-vim.cmd 'colorscheme retrobox'
+vim.cmd('colorscheme retrobox')
 
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config({ virtual_text = true })

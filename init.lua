@@ -1,3 +1,7 @@
+-- The Roslyn language server and all of its .dlls are manually downloaded to
+-- ~/.local/bin/roslyn, so add it to the path before trying to load the plugin.
+vim.env.PATH = vim.env.PATH .. ':' .. vim.fs.normalize('~/.local/bin/roslyn')
+
 -- Space leader.
 -- Do this before requiring plugins because...
 -- well... I dont even know at this point :shrug:
@@ -29,4 +33,5 @@ require('config.winbar')
 require('config.lsp.common')
 require('config.lsp.lua')
 require('config.lsp.deno')
+require('config.lsp.roslyn')
 require('config.lsp.attach')

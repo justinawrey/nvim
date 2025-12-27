@@ -13,3 +13,6 @@
 [submodule "pack/blink/start/blink"]
 	path = pack/blink/start/blink
 	url = https://github.com/saghen/blink.cmp.git
+[submodule "pack/roslyn/start/roslyn"]
+	path = pack/roslyn/start/roslyn
+	url = https://github.com/seblyng/roslyn.nvim.git
