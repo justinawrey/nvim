@@ -36,6 +36,11 @@ end
 -- open in the current buffer. If a parent git repo cannot
 -- be found, return the absolute path of the file.
 function _G.relative_filename()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.b[buf].is_welcome then
+    return ''
+  end
+
   if vim.bo.buftype == 'terminal' then
     return 'terminal'
   end
@@ -60,17 +65,17 @@ function _G.buffer_git_status()
 
   local parts = {}
 
-  if added > 0 then
+  if added ~= nil and added > 0 then
     table.insert(parts, '%#GitSignsAdd#' .. '+' .. added .. '%#WinBar#')
   end
-  if changed > 0 then
+  if changed ~= nil and changed > 0 then
     table.insert(parts, '%#GitSignsChange#' .. '~' .. changed .. '%#WinBar#')
   end
-  if removed > 0 then
+  if removed ~= nil and removed > 0 then
     table.insert(parts, '%#GitSignsDelete#' .. '-' .. removed .. '%#WinBar#')
   end
 
-  if added > 0 or changed > 0 or removed > 0 then
+  if #parts > 0 then
     return '[' .. table.concat(parts, ' ') .. ']'
   end
 
@@ -102,5 +107,4 @@ function _G.diagnostics_summary()
   return table.concat(parts, ' ')
 end
 
--- Put the absolute path of the current file in the winbar.
 vim.opt.winbar = '%{v:lua.relative_filename()} %{%v:lua.buffer_git_status()%} %{%v:lua.diagnostics_summary()%}'

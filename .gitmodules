@@ -13,3 +13,15 @@
 [submodule "pack/blink/start/blink"]
 	path = pack/blink/start/blink
 	url = https://github.com/saghen/blink.cmp.git
+[submodule "pack/none-ls/start/none-ls"]
+	path = pack/none-ls/start/none-ls
+	url = https://github.com/nvimtools/none-ls.nvim.git
+[submodule "pack/plenary/start/plenary"]
+	path = pack/plenary/start/plenary
+	url = https://github.com/nvim-lua/plenary.nvim.git
+[submodule "pack/treesitter/start/treesitter"]
+	path = pack/treesitter/start/treesitter
+	url = https://github.com/nvim-treesitter/nvim-treesitter
+[submodule "pack/gruvbox/start/gruvbox"]
+	path = pack/gruvbox/start/gruvbox
+	url = https://github.com/ellisonleao/gruvbox.nvim.git

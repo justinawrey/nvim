@@ -1,6 +1,10 @@
 -- Get line numbers.
 vim.opt.number = true
 
+-- Folds should start open.
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+
 -- Use spaces instead of tabs, and make them not huge.
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
@@ -43,7 +47,7 @@ vim.opt.swapfile = false
 -- Force a global statusbar.
 vim.opt.laststatus = 3
 
-vim.cmd('colorscheme retrobox')
+vim.cmd('colorscheme gruvbox')
 
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config({ virtual_text = true })

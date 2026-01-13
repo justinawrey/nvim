@@ -1,5 +1,3 @@
--- The Roslyn language server and all of its .dlls are manually downloaded to
--- ~/.local/bin/roslyn, so add it to the path before trying to load the plugin.
 vim.env.PATH = vim.env.PATH .. ':' .. vim.fs.normalize('~/.local/bin/roslyn')
 
 -- Space leader.
@@ -16,6 +14,9 @@ require('config.plug.gitsigns')
 require('config.plug.oil')
 require('config.plug.autopairs')
 require('config.plug.blink')
+require('config.plug.nonels')
+require('config.plug.treesitter')
+require('config.plug.gruvbox')
 
 -- Options and keymaps, a.k.a a bunch of
 -- one-off key-val settings, not really any logic.
@@ -25,11 +26,23 @@ require('config.keymaps')
 -- Custom statusline and winbar.
 require('config.statusline')
 require('config.winbar')
+require('config.tabline')
+require('config.keymaps')
+
+-- Some special shit
+require('config.recompile')
+require('config.startup')
 
 -- Do LSP setup in this order:
+--
 -- 1. Define common configuration
 -- 1. Define language specific configuration
 -- 1. Define 'LspAttach' autocmd
+--
+-- NOTE: if you're going to use two LSPs for the same
+-- filetypes like im doing here with lua_language_server + stylua
+-- and roslyn + csharpier via nonels, make sure to not
+-- double attach in config.lsp.attach.
 require('config.lsp.common')
 require('config.lsp.lua')
 require('config.lsp.deno')
