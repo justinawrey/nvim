@@ -6,7 +6,7 @@ require('init')
 -- Open default tabs the way I like it
 vim.cmd('tabe')
 vim.cmd('tcd ~')
-vim.cmd('e daily.md')
+vim.cmd('e ~/.config/daily/daily.md')
 vim.cmd('tabn 1')
 vim.cmd('Tname 1 nvim')
 vim.cmd('Tname 2 notes')
