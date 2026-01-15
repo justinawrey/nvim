@@ -72,6 +72,11 @@ vim.lsp.config['eslint'] = {
     'htmlangular',
   },
   workspace_required = true,
+  on_attach = function(client)
+    -- eslint should never format
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
   -- on_attach = function(client, bufnr)
   -- vim.api.nvim_buf_create_user_command(bufnr, 'LspEslintFixAll', function()
   --   client:request_sync('workspace/executeCommand', {

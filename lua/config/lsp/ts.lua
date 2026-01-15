@@ -98,6 +98,12 @@ vim.lsp.config['ts'] = {
 
     on_dir(project_root)
   end,
+
+  -- Ensure that vtsls doesnt format -- we wanna use prettierd
+  on_attach = function(client)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
 }
 
 vim.lsp.enable('ts')
