@@ -1,7 +1,7 @@
 local gruvbox = require('gruvbox')
 
 gruvbox.setup({
-  transparent_mode = true,
+  contrast = 'hard',
 })
 
 return gruvbox
