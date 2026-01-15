@@ -1,6 +1,8 @@
 -- Get line numbers.
 vim.opt.number = true
 
+vim.opt.messagesopt = 'wait:0,history:500'
+
 -- Folds should start open.
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
