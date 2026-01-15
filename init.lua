@@ -44,7 +44,9 @@ require('config.startup')
 -- and roslyn + csharpier via nonels, make sure to not
 -- double attach in config.lsp.attach.
 require('config.lsp.common')
+require('config.lsp.eslint')
 require('config.lsp.lua')
 require('config.lsp.deno')
+require('config.lsp.ts')
 require('config.lsp.roslyn')
 require('config.lsp.attach')

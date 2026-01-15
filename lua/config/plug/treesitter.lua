@@ -8,6 +8,11 @@ local treesitter = require('nvim-treesitter')
 local treesitter_langs = {
   lua = 'lua',
   cs = 'c_sharp',
+  yaml = 'yaml',
+  html = 'html',
+  javascript = 'javascript',
+  typescript = 'typescript',
+  vue = 'vue',
 }
 
 treesitter.install(vim.tbl_values(treesitter_langs))

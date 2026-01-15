@@ -65,9 +65,12 @@ vim.keymap.set('n', '<C-6>', '<CMD>tabn 6<CR>')
 
 -- Clear search highlight.
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><Esc>')
+vim.keymap.set('n', '<leader>lg', '<cmd>lua Snacks.lazygit()<CR>')
+vim.keymap.set('n', '<leader>ll', '<cmd>lua Snacks.lazygit.log()<CR>')
+vim.keymap.set('n', '<leader>lf', '<cmd>lua Snacks.lazygit.log_file()<CR>')
 
 -- Exit terminal mode with jj.
-vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+vim.keymap.set('t', '<C-c>', [[<C-\><C-n>]])
 vim.keymap.set('t', '<C-j>', '<Down>')
 vim.keymap.set('t', '<C-k>', '<Up>')
 
