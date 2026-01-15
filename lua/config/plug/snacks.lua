@@ -6,14 +6,14 @@ snacks.setup({
   },
   lazygit = {
     enable = true,
-    configure = true,
-    config = {
-      git = {
-        paging = {
-          pager = 'delta --dark --paging=never',
-        },
-      },
-    },
+    -- configure = true,
+    -- config = {
+    --   git = {
+    --     paging = {
+    --       pager = 'delta --dark --paging=never',
+    --     },
+    --   },
+    -- },
   },
 })
 
