@@ -1,10 +1,10 @@
 _G.justin_tabline = {
-  'code',
-  'notes',
-  'unnamed 3',
-  'unnamed 4',
-  'unnamed 5',
-  'unnamed 6',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
 }
 
 vim.api.nvim_create_user_command('Tname', function(args)
