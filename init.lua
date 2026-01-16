@@ -32,6 +32,7 @@ require('config.keymaps')
 -- Some special shit
 require('config.recompile')
 require('config.startup')
+require('config.notify')
 
 -- Do LSP setup in this order:
 --
