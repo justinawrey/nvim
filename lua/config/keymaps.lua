@@ -91,8 +91,8 @@ vim.keymap.set('n', '<leader>cc', function()
   require('config.floating_win').open_floating_win('claude', 'claude')
 end)
 
--- Exit terminal mode with jj.
-vim.keymap.set('t', '<C-c>', [[<C-\><C-n>]])
+-- Exit terminal mode with C-q.
+vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
 vim.keymap.set('t', '<C-j>', '<Down>')
 vim.keymap.set('t', '<C-k>', '<Up>')
 
