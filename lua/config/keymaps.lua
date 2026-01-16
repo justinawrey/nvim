@@ -87,6 +87,10 @@ vim.keymap.set('n', '<leader>lf', function()
   require('config.floating_win').open_floating_win({ 'lazygit', '--filter', file }, 'lazygit')
 end)
 
+vim.keymap.set('n', '<leader>cc', function()
+  require('config.floating_win').open_floating_win('claude', 'claude')
+end)
+
 -- Exit terminal mode with jj.
 vim.keymap.set('t', '<C-c>', [[<C-\><C-n>]])
 vim.keymap.set('t', '<C-j>', '<Down>')
