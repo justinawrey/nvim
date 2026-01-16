@@ -88,7 +88,7 @@ vim.keymap.set('n', '<leader>lf', function()
 end)
 
 vim.keymap.set('n', '<leader>cc', function()
-  require('config.floating_win').open_floating_win('claude', 'claude')
+  require('config.floating_win').open_floating_win('claude', 'claude', true)
 end)
 
 -- Exit terminal mode with C-q.

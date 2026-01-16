@@ -1,6 +1,8 @@
 local M = {}
 
-function M.open_floating_win(cmd, title)
+local persistent_terms = {}
+
+function M.open_floating_win(cmd, title, persist)
   -- Screen dimensions
   local columns = vim.o.columns
   local lines = vim.o.lines
@@ -32,8 +34,20 @@ function M.open_floating_win(cmd, title)
   vim.api.nvim_win_set_option(backdrop_win, 'winhl', 'Normal:FloatBackdrop')
   vim.api.nvim_win_set_option(backdrop_win, 'winblend', 60)
 
-  -- Create buffer
-  local buf = vim.api.nvim_create_buf(false, true)
+  local buf
+  local spawn = false
+  if persist then
+    buf = persistent_terms[cmd]
+
+    if not buf or not vim.api.nvim_buf_is_valid(buf) then
+      buf = vim.api.nvim_create_buf(false, true)
+      persistent_terms[cmd] = buf
+      spawn = true
+    end
+  else
+    buf = vim.api.nvim_create_buf(false, true)
+    spawn = true
+  end
 
   -- Open floating window
   local floating_win = vim.api.nvim_open_win(buf, true, {
@@ -50,13 +64,15 @@ function M.open_floating_win(cmd, title)
 
   vim.api.nvim_set_hl(0, 'NormalFloat', { link = 'Normal' })
 
-  vim.fn.termopen(cmd, {
-    on_exit = function()
-      if vim.api.nvim_win_is_valid(floating_win) then
-        vim.api.nvim_win_close(floating_win, true)
-      end
-    end,
-  })
+  if spawn then
+    vim.fn.termopen(cmd, {
+      on_exit = function()
+        if vim.api.nvim_win_is_valid(floating_win) then
+          vim.api.nvim_win_close(floating_win, true)
+        end
+      end,
+    })
+  end
 
   -- IMPORTANT: enter terminal mode
   vim.cmd('startinsert')
