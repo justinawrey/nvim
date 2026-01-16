@@ -24,14 +24,7 @@
 --- -- For Mason v2,
 --- -- local vue_language_server_path = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server'
 --- -- or even
---- -- local vue_language_server_path = vim.fn.stdpath('data') .. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
---- local vue_language_server_path = '/path/to/@vue/language-server'
---- local vue_plugin = {
----   name = '@vue/typescript-plugin',
----   location = vue_language_server_path,
----   languages = { 'vue' },
----   configNamespace = 'typescript',
---- }
+
 --- vim.lsp.config('vtsls', {
 ---   settings = {
 ---     vtsls = {
@@ -65,18 +58,33 @@
 ---
 --- It is recommended to use the same version of TypeScript in all packages, and therefore have it available in your workspace root. The location of the TypeScript binary will be determined automatically, but only once.
 
+local vue_plugin = {
+  name = '@vue/typescript-plugin',
+  location = '/opt/homebrew/Cellar/vue-language-server/3.2.2/libexec/lib/node_modules/@vue/language-server/node_modules',
+  languages = { 'vue' },
+  configNamespace = 'typescript',
+}
+
 vim.lsp.config['ts'] = {
   cmd = { 'vtsls', '--stdio' },
   init_options = {
     hostInfo = 'neovim',
   },
+  settings = {
+    vtsls = {
+      tsserver = {
+        globalPlugins = {
+          vue_plugin,
+        },
+      },
+    },
+  },
   filetypes = {
+    'vue',
     'javascript',
     'javascriptreact',
-    'javascript.jsx',
     'typescript',
     'typescriptreact',
-    'typescript.tsx',
   },
   root_dir = function(bufnr, on_dir)
     -- The project root is where the LSP can be started from
