@@ -65,9 +65,27 @@ vim.keymap.set('n', '<C-6>', '<CMD>tabn 6<CR>')
 
 -- Clear search highlight.
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><Esc>')
-vim.keymap.set('n', '<leader>lg', '<cmd>lua Snacks.lazygit()<CR>')
-vim.keymap.set('n', '<leader>ll', '<cmd>lua Snacks.lazygit.log()<CR>')
-vim.keymap.set('n', '<leader>lf', '<cmd>lua Snacks.lazygit.log_file()<CR>')
+
+vim.keymap.set('n', '<leader>lg', function()
+  require('config.floating_win').open_floating_win('lazygit', 'lazygit')
+end)
+
+vim.keymap.set('n', '<leader>ll', function()
+  require('config.floating_win').open_floating_win('lazygit log', 'lazygit')
+end)
+
+vim.keymap.set('n', '<leader>ls', function()
+  require('config.floating_win').open_floating_win('lazygit status', 'lazygit')
+end)
+
+vim.keymap.set('n', '<leader>lb', function()
+  require('config.floating_win').open_floating_win('lazygit branch', 'lazygit')
+end)
+
+vim.keymap.set('n', '<leader>lf', function()
+  local file = vim.api.nvim_buf_get_name(0)
+  require('config.floating_win').open_floating_win({ 'lazygit', '--filter', file }, 'lazygit')
+end)
 
 -- Exit terminal mode with jj.
 vim.keymap.set('t', '<C-c>', [[<C-\><C-n>]])
