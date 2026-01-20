@@ -13,6 +13,7 @@ local treesitter_langs = {
   javascript = 'javascript',
   typescript = 'typescript',
   vue = 'vue',
+  markdown = 'markdown',
 }
 
 treesitter.install(vim.tbl_values(treesitter_langs))

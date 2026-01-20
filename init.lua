@@ -17,6 +17,7 @@ require('config.plug.blink')
 require('config.plug.nonels')
 require('config.plug.treesitter')
 require('config.plug.gruvbox')
+require('config.plug.md')
 
 -- Options and keymaps, a.k.a a bunch of
 -- one-off key-val settings, not really any logic.
@@ -44,6 +45,7 @@ require('config.notify')
 require('config.lsp.common')
 require('config.lsp.eslint')
 require('config.lsp.lua')
+require('config.lsp.md')
 require('config.lsp.deno')
 require('config.lsp.ts')
 require('config.lsp.vue')

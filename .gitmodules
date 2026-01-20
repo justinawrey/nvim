@@ -25,3 +25,6 @@
 [submodule "pack/gruvbox/start/gruvbox"]
 	path = pack/gruvbox/start/gruvbox
 	url = https://github.com/ellisonleao/gruvbox.nvim.git
+[submodule "pack/render-md/start/render-md"]
+	path = pack/render-md/start/render-md
+	url = https://github.com/MeanderingProgrammer/render-markdown.nvim.git
