@@ -162,6 +162,9 @@ vim.keymap.set('n', '<leader>sg', function()
     exclude = picker_ignore,
   })
 end)
+vim.keymap.set('n', '<leader>sag', function()
+  Snacks.picker.grep({ hidden = true, ignore = true })
+end)
 vim.keymap.set('n', '<leader>st', function()
   local function startswith(str, prefix)
     return str:sub(1, #prefix) == prefix
