@@ -2,7 +2,7 @@ local M = {}
 
 local persistent_terms = {}
 
-function M.open_floating_win(cmd, title, persist)
+function M.open_floating_win(cmd, title, persist, on_close)
   -- Screen dimensions
   local columns = vim.o.columns
   local lines = vim.o.lines
@@ -68,6 +68,7 @@ function M.open_floating_win(cmd, title, persist)
     vim.fn.termopen(cmd, {
       on_exit = function()
         if vim.api.nvim_win_is_valid(floating_win) then
+          on_close()
           vim.api.nvim_win_close(floating_win, true)
         end
       end,
@@ -87,6 +88,8 @@ function M.open_floating_win(cmd, title, persist)
       end
     end,
   })
+
+  return buf
 end
 
 return M

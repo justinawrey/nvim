@@ -25,7 +25,7 @@ end, { nargs = '?' })
 
 -- Default term
 vim.api.nvim_create_user_command('T', function(args)
-  vim.cmd('Ht ' .. args.args)
+  vim.cmd('Vt ' .. args.args)
 end, { nargs = '?' })
 
 -- Easier exiting insert mode.
@@ -66,35 +66,77 @@ vim.keymap.set('n', '<C-6>', '<CMD>tabn 6<CR>')
 -- Clear search highlight.
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><Esc>')
 
+-- Exit terminal mode with jj.
+vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+vim.keymap.set('t', '<C-j>', '<Down>')
+vim.keymap.set('t', '<C-k>', '<Up>')
+
+-- Terminal-normal-mode <C-d>: exit shell + close buffer
+vim.keymap.set('n', '<C-d>', function()
+  -- Only act in terminal buffers
+  if vim.bo.buftype ~= 'terminal' then
+    return
+  end
+
+  -- Enter terminal mode
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('i<C-d>', true, false, true), 'n', false)
+
+  -- Close the buffer after shell exits
+  vim.schedule(function()
+    if vim.api.nvim_buf_is_valid(0) then
+      vim.cmd('bd!')
+    end
+  end)
+end, { silent = true })
+
+-- lazygit mappings. we're doing a bit of a hack here -- removing and adding global mappings
+-- when going in and out of lazygit via these keybindings. there is probably a more robust
+-- way but you know what? idc
 vim.keymap.set('n', '<leader>lg', function()
-  require('config.floating_win').open_floating_win('lazygit', 'lazygit')
+  vim.keymap.del('t', 'jj')
+
+  require('config.floating_win').open_floating_win('lazygit', 'lazygit', false, function()
+    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+  end)
 end)
 
 vim.keymap.set('n', '<leader>ll', function()
-  require('config.floating_win').open_floating_win('lazygit log', 'lazygit')
+  vim.keymap.del('t', 'jj')
+
+  require('config.floating_win').open_floating_win('lazygit log', 'lazygit', false, function()
+    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+  end)
 end)
 
 vim.keymap.set('n', '<leader>ls', function()
-  require('config.floating_win').open_floating_win('lazygit status', 'lazygit')
+  vim.keymap.del('t', 'jj')
+
+  require('config.floating_win').open_floating_win('lazygit status', 'lazygit', false, function()
+    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+  end)
 end)
 
 vim.keymap.set('n', '<leader>lb', function()
-  require('config.floating_win').open_floating_win('lazygit branch', 'lazygit')
+  vim.keymap.del('t', 'jj')
+
+  require('config.floating_win').open_floating_win('lazygit branch', 'lazygit', false, function()
+    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+  end)
 end)
 
 vim.keymap.set('n', '<leader>lf', function()
+  vim.keymap.del('t', 'jj')
+
   local file = vim.api.nvim_buf_get_name(0)
-  require('config.floating_win').open_floating_win({ 'lazygit', '--filter', file }, 'lazygit')
+  require('config.floating_win').open_floating_win({ 'lazygit', '--filter', file }, 'lazygit', false, function()
+    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+  end)
 end)
 
+-- claude mappings
 vim.keymap.set('n', '<leader>cc', function()
   require('config.floating_win').open_floating_win('claude', 'claude', true)
 end)
-
--- Exit terminal mode with C-q.
-vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
-vim.keymap.set('t', '<C-j>', '<Down>')
-vim.keymap.set('t', '<C-k>', '<Up>')
 
 -- Open oil in cwd of active buf.
 vim.keymap.set('n', '-', '<CMD>Oil --float<CR>')
