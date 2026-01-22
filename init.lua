@@ -1,3 +1,4 @@
+-- I stuff roslyn here...
 vim.env.PATH = vim.env.PATH .. ':' .. vim.fs.normalize('~/.local/bin/roslyn')
 
 -- Space leader.
