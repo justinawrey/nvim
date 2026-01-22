@@ -95,7 +95,7 @@ end, { silent = true })
 vim.keymap.set('n', '<leader>lg', function()
   vim.keymap.del('t', 'jj')
 
-  require('config.floating_win').open_floating_win('lazygit', 'lazygit', false, function()
+  require('config.floating_win').open_floating_win_with_term('lazygit', 'lazygit', false, function()
     vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
   end)
 end)
@@ -103,7 +103,7 @@ end)
 vim.keymap.set('n', '<leader>ll', function()
   vim.keymap.del('t', 'jj')
 
-  require('config.floating_win').open_floating_win('lazygit log', 'lazygit', false, function()
+  require('config.floating_win').open_floating_win_with_term('lazygit log', 'lazygit', false, function()
     vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
   end)
 end)
@@ -111,7 +111,7 @@ end)
 vim.keymap.set('n', '<leader>ls', function()
   vim.keymap.del('t', 'jj')
 
-  require('config.floating_win').open_floating_win('lazygit status', 'lazygit', false, function()
+  require('config.floating_win').open_floating_win_with_term('lazygit status', 'lazygit', false, function()
     vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
   end)
 end)
@@ -119,7 +119,7 @@ end)
 vim.keymap.set('n', '<leader>lb', function()
   vim.keymap.del('t', 'jj')
 
-  require('config.floating_win').open_floating_win('lazygit branch', 'lazygit', false, function()
+  require('config.floating_win').open_floating_win_with_term('lazygit branch', 'lazygit', false, function()
     vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
   end)
 end)
@@ -128,14 +128,24 @@ vim.keymap.set('n', '<leader>lf', function()
   vim.keymap.del('t', 'jj')
 
   local file = vim.api.nvim_buf_get_name(0)
-  require('config.floating_win').open_floating_win({ 'lazygit', '--filter', file }, 'lazygit', false, function()
-    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
-  end)
+  require('config.floating_win').open_floating_win_with_term(
+    { 'lazygit', '--filter', file },
+    'lazygit',
+    false,
+    function()
+      vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+    end
+  )
 end)
 
 -- claude mappings
+vim.keymap.set('n', '<leader>n', function()
+  require('config.floating_win').open_floating_win('~/.config/daily/daily.md', 'notes')
+end)
+
+-- notes mappings
 vim.keymap.set('n', '<leader>cc', function()
-  require('config.floating_win').open_floating_win('claude', 'claude', true)
+  require('config.floating_win').open_floating_win_with_term('claude', 'claude', true)
 end)
 
 -- Open oil in cwd of active buf.
