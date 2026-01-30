@@ -242,6 +242,12 @@ vim.keymap.set('n', '<leader>st', function()
           ['<c-d>'] = { 'bufdelete', mode = { 'n', 'i' } },
         },
       },
+      preview = {
+        wo = {
+          number = false,
+          signcolumn = 'no',
+        },
+      },
     },
   })
 end)

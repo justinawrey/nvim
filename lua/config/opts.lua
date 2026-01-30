@@ -53,3 +53,15 @@ vim.cmd('colorscheme gruvbox')
 
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config({ virtual_text = true })
+
+-- Disable line numbers in terminal buffers.
+vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter', 'BufWinEnter' }, {
+  callback = function()
+    if vim.bo.buftype == 'terminal' then
+      vim.schedule(function()
+        vim.opt_local.number = false
+        vim.opt_local.signcolumn = 'no'
+      end)
+    end
+  end,
+})
