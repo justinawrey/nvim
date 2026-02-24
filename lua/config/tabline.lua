@@ -1,24 +1,32 @@
-_G.justin_tabline = {
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-}
+local tab_branches = {}
 
-vim.api.nvim_create_user_command('Tname', function(args)
-  if #args.fargs ~= 2 then
-    vim.notify('usage: Tname <number> <name>')
-    return
+local function get_branch_name(tabnr)
+  local cwd = vim.fn.getcwd(-1, tabnr)
+  vim.system({ 'git', '-C', cwd, 'branch', '--show-current' }, { text = true }, function(result)
+    local branch = vim.trim(result.stdout or '')
+    if branch == '' then
+      tab_branches[tabnr] = tostring(tabnr)
+    else
+      tab_branches[tabnr] = branch
+    end
+    vim.schedule(function()
+      vim.cmd('redrawtabline')
+    end)
+  end)
+end
+
+local function update_tab_branches()
+  for i = 1, vim.fn.tabpagenr('$') do
+    get_branch_name(i)
   end
+end
 
-  local number = args.fargs[1]
-  local name = args.fargs[2]
+vim.api.nvim_create_autocmd({ 'TabEnter', 'TabNew', 'TabClosed', 'DirChanged', 'FocusGained' }, {
+  callback = update_tab_branches,
+})
 
-  _G.justin_tabline[tonumber(number)] = name
-  vim.api.nvim_command('redrawtabline')
-end, { nargs = '*' })
+-- Initial population
+update_tab_branches()
 
 function _G.custom_tabline()
   local s = ''
@@ -31,16 +39,8 @@ function _G.custom_tabline()
       s = s .. '%#TabLine#'
     end
 
-    s = s .. ' ' .. _G.justin_tabline[i] .. ' '
+    s = s .. ' ' .. (tab_branches[i] or tostring(i)) .. ' '
   end
-
-  -- after the last tab page fill with TabLineFill and reset tab page nr
-  -- s = s .. '%#TabLineFill#%T'
-  --
-  -- -- right-align the label to close the current tab page
-  -- if vim.fn.tabpagenr('$') > 1 then
-  --   s = s .. '%=%#TabLine#%999Xclose'
-  -- end
 
   return s
 end
