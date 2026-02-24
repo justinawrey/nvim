@@ -92,50 +92,53 @@ end, { silent = true })
 -- lazygit mappings. we're doing a bit of a hack here -- removing and adding global mappings
 -- when going in and out of lazygit via these keybindings. there is probably a more robust
 -- way but you know what? idc
-vim.keymap.set('n', '<leader>lg', function()
+local function open_lazygit(cmd)
   vim.keymap.del('t', 'jj')
 
-  require('config.floating_win').open_floating_win_with_term('lazygit', 'lazygit', false, function()
+  local tmpfile = vim.fn.tempname()
+  local env_prefix = 'LAZYGIT_NEW_DIR_FILE=' .. vim.fn.shellescape(tmpfile) .. ' '
+  local wrapped_cmd
+  if type(cmd) == 'table' then
+    wrapped_cmd = env_prefix .. table.concat(cmd, ' ')
+  else
+    wrapped_cmd = env_prefix .. cmd
+  end
+
+  require('config.floating_win').open_floating_win_with_term(wrapped_cmd, 'lazygit', false, function()
     vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
+
+    local f = io.open(tmpfile, 'r')
+    if f then
+      local new_cwd = f:read('*a')
+      f:close()
+      os.remove(tmpfile)
+
+      if new_cwd and new_cwd ~= '' and new_cwd ~= vim.uv.cwd() then
+        vim.cmd('cd ' .. vim.fn.fnameescape(new_cwd))
+      end
+    end
   end)
+end
+
+vim.keymap.set('n', '<leader>lg', function()
+  open_lazygit('lazygit')
 end)
 
 vim.keymap.set('n', '<leader>ll', function()
-  vim.keymap.del('t', 'jj')
-
-  require('config.floating_win').open_floating_win_with_term('lazygit log', 'lazygit', false, function()
-    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
-  end)
+  open_lazygit('lazygit log')
 end)
 
 vim.keymap.set('n', '<leader>ls', function()
-  vim.keymap.del('t', 'jj')
-
-  require('config.floating_win').open_floating_win_with_term('lazygit status', 'lazygit', false, function()
-    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
-  end)
+  open_lazygit('lazygit status')
 end)
 
 vim.keymap.set('n', '<leader>lb', function()
-  vim.keymap.del('t', 'jj')
-
-  require('config.floating_win').open_floating_win_with_term('lazygit branch', 'lazygit', false, function()
-    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
-  end)
+  open_lazygit('lazygit branch')
 end)
 
 vim.keymap.set('n', '<leader>lf', function()
-  vim.keymap.del('t', 'jj')
-
   local file = vim.api.nvim_buf_get_name(0)
-  require('config.floating_win').open_floating_win_with_term(
-    { 'lazygit', '--filter', file },
-    'lazygit',
-    false,
-    function()
-      vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
-    end
-  )
+  open_lazygit({ 'lazygit', '--filter', file })
 end)
 
 -- claude mappings
