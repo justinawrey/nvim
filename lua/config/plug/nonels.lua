@@ -59,12 +59,13 @@ local csharpier_server = {
 nonels.setup({
   sources = {
     csharpier_server,
-    nonels.builtins.formatting.prettierd.with({
-      env = {
-        PRETTIERD_DEFAULT_CONFIG = vim.fn.expand('~/goblin-client-tools/.prettierrc.cjs'),
-        PRETTIERD_LOCAL_PRETTIER_ONLY = 1,
-      },
-    }),
+    nonels.builtins.formatting.prettierd,
+    -- nonels.builtins.formatting.prettierd.with({
+    --   env = {
+    --     PRETTIERD_DEFAULT_CONFIG = vim.fn.getcwd() .. '/.prettierrc.js',
+    --     PRETTIERD_LOCAL_PRETTIER_ONLY = 1,
+    --   },
+    -- }),
   },
 })
 
