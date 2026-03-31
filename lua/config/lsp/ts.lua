@@ -107,7 +107,7 @@ vim.lsp.config['ts'] = {
     on_dir(project_root)
   end,
 
-  -- Ensure that vtsls doesnt format -- we wanna use prettierd
+  -- Ensure that vtsls doesnt format -- we wanna use oxfmt
   on_attach = function(client)
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false

@@ -107,16 +107,43 @@ local function open_lazygit(cmd)
   require('config.floating_win').open_floating_win_with_term(wrapped_cmd, 'lazygit', false, function()
     vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
 
-    local f = io.open(tmpfile, 'r')
-    if f then
-      local new_cwd = f:read('*a')
-      f:close()
-      os.remove(tmpfile)
+    vim.schedule(function()
+      local f = io.open(tmpfile, 'r')
+      if f then
+        local new_cwd = f:read('*a'):gsub('%s+$', '')
+        f:close()
+        os.remove(tmpfile)
 
-      if new_cwd and new_cwd ~= '' and new_cwd ~= vim.uv.cwd() then
-        vim.cmd('cd ' .. vim.fn.fnameescape(new_cwd))
+        local resolve = vim.uv.fs_realpath
+        local current_cwd = resolve(vim.fn.getcwd()) or vim.fn.getcwd()
+        local resolved_new = resolve(new_cwd) or new_cwd
+
+        if resolved_new ~= '' and resolved_new ~= current_cwd then
+          local function cwd_matches(cwd)
+            return (resolve(cwd) or cwd) == resolved_new
+          end
+
+          local found_tab = nil
+          for tabnr = 1, vim.fn.tabpagenr('$') do
+            -- Check both tab-level cwd (tcd) and the active window's cwd,
+            -- so we also match tabs whose tcd was never set or was cleared.
+            if cwd_matches(vim.fn.getcwd(-1, tabnr))
+              or cwd_matches(vim.fn.getcwd(vim.fn.tabpagewinnr(tabnr), tabnr))
+            then
+              found_tab = tabnr
+              break
+            end
+          end
+
+          if found_tab then
+            vim.cmd('tabn ' .. found_tab)
+          else
+            vim.cmd('tabnew')
+            vim.cmd('tcd ' .. vim.fn.fnameescape(new_cwd))
+          end
+        end
       end
-    end
+    end)
   end)
 end
 
@@ -253,6 +280,34 @@ vim.keymap.set('n', '<leader>st', function()
       },
     },
   })
+end)
+
+-- Jump to tab from last Claude Code notification.
+vim.keymap.set('n', '<leader>d', function()
+  local f = io.open(vim.fn.expand('~/.claude/last_notification_cwd'), 'r')
+  if not f then
+    return
+  end
+  local target_cwd = f:read('*a'):gsub('%s+$', '')
+  f:close()
+
+  if not target_cwd or target_cwd == '' then
+    return
+  end
+
+  for tabnr = 1, vim.fn.tabpagenr('$') do
+    if vim.fn.getcwd(-1, tabnr) == target_cwd then
+      vim.cmd('tabn ' .. tabnr)
+      return
+    end
+  end
+end)
+
+-- Clear the notification bullet on the current tab.
+vim.keymap.set('n', '<leader>a', function()
+  local cwd = vim.fn.getcwd(-1, vim.fn.tabpagenr())
+  _G.clear_tab_attention(cwd)
+  _G.stop_tab_spinner(cwd)
 end)
 
 -- Open oil in cwd.
