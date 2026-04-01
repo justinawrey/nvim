@@ -1,0 +1,7 @@
+gui:
+  sidePanelWidth: 0.15
+  showCommandLog: false
+git:
+  pagers:
+    - pager: delta --paging=never --side-by-side --line-numbers-left-format="" --line-numbers-right-format=""
+    - pager: delta --paging=never
