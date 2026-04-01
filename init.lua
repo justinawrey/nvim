@@ -32,7 +32,6 @@ require('config.tabline')
 require('config.recompile')
 require('config.startup')
 require('config.notify')
-require('config.claude')
 
 -- Do LSP setup in this order:
 --

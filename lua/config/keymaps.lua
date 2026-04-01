@@ -96,12 +96,14 @@ local function open_lazygit(cmd)
   vim.keymap.del('t', 'jj')
 
   local tmpfile = vim.fn.tempname()
+  local config_path = vim.fn.stdpath('config') .. '/lazygit.yml'
   local env_prefix = 'LAZYGIT_NEW_DIR_FILE=' .. vim.fn.shellescape(tmpfile) .. ' '
+  local config_flag = ' --use-config-file=' .. vim.fn.shellescape(config_path)
   local wrapped_cmd
   if type(cmd) == 'table' then
-    wrapped_cmd = env_prefix .. table.concat(cmd, ' ')
+    wrapped_cmd = env_prefix .. table.concat(cmd, ' ') .. config_flag
   else
-    wrapped_cmd = env_prefix .. cmd
+    wrapped_cmd = env_prefix .. cmd .. config_flag
   end
 
   require('config.floating_win').open_floating_win_with_term(wrapped_cmd, 'lazygit', false, function()
@@ -127,7 +129,8 @@ local function open_lazygit(cmd)
           for tabnr = 1, vim.fn.tabpagenr('$') do
             -- Check both tab-level cwd (tcd) and the active window's cwd,
             -- so we also match tabs whose tcd was never set or was cleared.
-            if cwd_matches(vim.fn.getcwd(-1, tabnr))
+            if
+              cwd_matches(vim.fn.getcwd(-1, tabnr))
               or cwd_matches(vim.fn.getcwd(vim.fn.tabpagewinnr(tabnr), tabnr))
             then
               found_tab = tabnr

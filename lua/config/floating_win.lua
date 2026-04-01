@@ -8,8 +8,8 @@ function M.open_floating_win_with_term(cmd, title, persist, on_close)
   local lines = vim.o.lines
 
   -- Window size (80%)
-  local width = math.floor(columns * 0.9)
-  local height = math.floor(lines * 0.85)
+  local width = math.floor(columns * 0.98)
+  local height = math.floor(lines * 0.9)
 
   -- Center position
   local col = math.floor((columns - width) / 2)
@@ -98,8 +98,8 @@ function M.open_floating_win(file, title)
   local lines = vim.o.lines
 
   -- Window size (80%)
-  local width = math.floor(columns * 0.9)
-  local height = math.floor(lines * 0.85)
+  local width = math.floor(columns * 0.98)
+  local height = math.floor(lines * 0.9)
 
   -- Center position
   local col = math.floor((columns - width) / 2)
