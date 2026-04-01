@@ -35,7 +35,6 @@ vim.api.nvim_create_autocmd('VimEnter', {
       vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 
       vim.cmd('setlocal nomodifiable')
-      vim.cmd('setlocal nonumber norelativenumber') -- optional, for clean look
     end
   end,
 })
