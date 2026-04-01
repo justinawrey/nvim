@@ -46,8 +46,40 @@ vim.keymap.set('n', '2', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<C-n>', vim.lsp.buf.hover)
 
 -- Make vertical splits more/less wide.
-vim.keymap.set('n', '<C-9>', '<C-w>6>')
-vim.keymap.set('n', '<C-0>', '<C-w>6<')
+-- '(' always moves the divider left, ')' always moves it right,
+-- regardless of whether the window is rightmost or not.
+vim.keymap.set('n', '<C-9>', function()
+  if vim.fn.winnr() == vim.fn.winnr('l') then
+    vim.cmd('6wincmd >')
+  else
+    vim.cmd('6wincmd <')
+  end
+end)
+vim.keymap.set('n', '<C-0>', function()
+  if vim.fn.winnr() == vim.fn.winnr('l') then
+    vim.cmd('6wincmd <')
+  else
+    vim.cmd('6wincmd >')
+  end
+end)
+
+-- Make horizontal splits more/less tall.
+-- C-7 always moves the divider down, C-8 always moves it up,
+-- regardless of whether the window is bottommost or not.
+vim.keymap.set('n', '<C-7>', function()
+  if vim.fn.winnr() == vim.fn.winnr('j') then
+    vim.cmd('6wincmd -')
+  else
+    vim.cmd('6wincmd +')
+  end
+end)
+vim.keymap.set('n', '<C-8>', function()
+  if vim.fn.winnr() == vim.fn.winnr('j') then
+    vim.cmd('6wincmd +')
+  else
+    vim.cmd('6wincmd -')
+  end
+end)
 
 -- Navigate between panes.
 vim.keymap.set('n', '<C-h>', '<C-w>h')
@@ -287,32 +319,32 @@ vim.keymap.set('n', '<leader>st', function()
 end)
 
 -- Jump to tab from last Claude Code notification.
-vim.keymap.set('n', '<leader>d', function()
-  local f = io.open(vim.fn.expand('~/.claude/last_notification_cwd'), 'r')
-  if not f then
-    return
-  end
-  local target_cwd = f:read('*a'):gsub('%s+$', '')
-  f:close()
-
-  if not target_cwd or target_cwd == '' then
-    return
-  end
-
-  for tabnr = 1, vim.fn.tabpagenr('$') do
-    if vim.fn.getcwd(-1, tabnr) == target_cwd then
-      vim.cmd('tabn ' .. tabnr)
-      return
-    end
-  end
-end)
+-- vim.keymap.set('n', '<leader>d', function()
+--   local f = io.open(vim.fn.expand('~/.claude/last_notification_cwd'), 'r')
+--   if not f then
+--     return
+--   end
+--   local target_cwd = f:read('*a'):gsub('%s+$', '')
+--   f:close()
+--
+--   if not target_cwd or target_cwd == '' then
+--     return
+--   end
+--
+--   for tabnr = 1, vim.fn.tabpagenr('$') do
+--     if vim.fn.getcwd(-1, tabnr) == target_cwd then
+--       vim.cmd('tabn ' .. tabnr)
+--       return
+--     end
+--   end
+-- end)
 
 -- Clear the notification bullet on the current tab.
-vim.keymap.set('n', '<leader>a', function()
-  local cwd = vim.fn.getcwd(-1, vim.fn.tabpagenr())
-  _G.clear_tab_attention(cwd)
-  _G.stop_tab_spinner(cwd)
-end)
+-- vim.keymap.set('n', '<leader>a', function()
+--   local cwd = vim.fn.getcwd(-1, vim.fn.tabpagenr())
+--   _G.clear_tab_attention(cwd)
+--   _G.stop_tab_spinner(cwd)
+-- end)
 
 -- Open oil in cwd.
 vim.keymap.set('n', '<C-->', function()
