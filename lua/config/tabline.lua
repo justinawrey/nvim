@@ -14,14 +14,48 @@ local function update_showtabline()
   vim.opt.showtabline = #M.worktrees > 0 and 2 or 0
 end
 
+local function setup_tab(path)
+  vim.cmd('tcd ' .. vim.fn.fnameescape(path))
+  Snacks.picker.explorer({
+    exclude = { '*.meta' },
+    hidden = true,
+    ignored = true,
+    layout = { layout = { width = 20, min_width = 20 } },
+  })
+  vim.cmd('ter claude')
+end
+
 function M.add(path, branch, repo)
+  if #M.worktrees == 0 then
+    setup_tab(path)
+  else
+    vim.cmd('tabnew')
+    setup_tab(path)
+  end
+
   table.insert(M.worktrees, { path = path, branch = branch, repo = repo })
   update_showtabline()
   vim.cmd('redrawtabline')
 end
 
 function M.remove(index)
+  local tabpages = vim.api.nvim_list_tabpages()
+  local target = tabpages[index]
+  if not target then
+    return
+  end
+
+  vim.api.nvim_set_current_tabpage(target)
+  vim.cmd('tabclose')
+
   table.remove(M.worktrees, index)
+
+  local focus_index = index > 1 and index - 1 or 1
+  local remaining = vim.api.nvim_list_tabpages()
+  if remaining[focus_index] then
+    vim.api.nvim_set_current_tabpage(remaining[focus_index])
+  end
+
   update_showtabline()
   vim.cmd('redrawtabline')
 end
