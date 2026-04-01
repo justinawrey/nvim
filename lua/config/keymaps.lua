@@ -226,12 +226,11 @@ vim.keymap.set('n', '<leader><space>', function()
     },
   })
 end)
-vim.keymap.set('n', '<leader>saf', function()
-  Snacks.picker.files({ hidden = true, ignore = true })
-end)
 vim.keymap.set('n', '<leader>sf', function()
   Snacks.picker.files({
     exclude = picker_ignore,
+    hidden = true,
+    ignored = true,
   })
 end)
 vim.keymap.set('n', '<leader>sd', function()
@@ -240,15 +239,17 @@ end)
 vim.keymap.set('n', '<leader>se', function()
   Snacks.picker.explorer({
     exclude = { '*.meta' },
+    hidden = true,
+    ignored = true,
+    layout = { layout = { width = 20, min_width = 20 } },
   })
 end)
 vim.keymap.set('n', '<leader>sg', function()
   Snacks.picker.grep({
     exclude = picker_ignore,
+    hidden = true,
+    ignored = true,
   })
-end)
-vim.keymap.set('n', '<leader>sag', function()
-  Snacks.picker.grep({ hidden = true, ignore = true })
 end)
 vim.keymap.set('n', '<leader>st', function()
   local function startswith(str, prefix)
