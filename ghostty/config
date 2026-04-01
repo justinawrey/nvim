@@ -1,0 +1,10 @@
+theme = dark:Gruvbox Dark Hard,light:Gruvbox Light Hard
+macos-titlebar-style = hidden
+background-opacity = 0.95
+background-blur = true
+shell-integration-features = no-cursor
+cursor-style = block
+window-save-state = always
+mouse-hide-while-typing = true
+desktop-notifications = false
+font-size = 14
