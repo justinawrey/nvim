@@ -28,10 +28,11 @@ require('config.keymaps')
 -- Custom statusline and winbar.
 require('config.statusline')
 require('config.winbar')
-require('config.tabline')
 require('config.recompile')
-require('config.startup')
 require('config.notify')
+
+local cwd = vim.loop.cwd()
+require('config.tabline').add(cwd, cwd, cwd)
 
 -- Do LSP setup in this order:
 --
