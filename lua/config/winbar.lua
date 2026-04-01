@@ -107,4 +107,17 @@ function _G.diagnostics_summary()
   return table.concat(parts, ' ')
 end
 
-vim.opt.winbar = '%{v:lua.relative_filename()} %{%v:lua.buffer_git_status()%} %{%v:lua.diagnostics_summary()%}'
+function _G.winbar()
+  local ft = vim.bo.filetype
+  if ft == 'snacks_layout_box' then
+    return ''
+  end
+
+  return relative_filename()
+    .. ' '
+    .. buffer_git_status()
+    .. ' '
+    .. diagnostics_summary()
+end
+
+vim.opt.winbar = '%{%v:lua.winbar()%}'
