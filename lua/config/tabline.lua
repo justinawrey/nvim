@@ -5,6 +5,11 @@ local M = {}
 --- Each entry: { path = string, branch = string, repo = string }
 M.worktrees = {}
 
+-- Alternating highlight groups for legibility.
+-- Odd entries use bg1 (#3c3836), even entries use bg0 (#282828).
+vim.api.nvim_set_hl(0, 'TabLineAlt', { fg = '#7c6f64', bg = '#282828' })
+vim.api.nvim_set_hl(0, 'TabLineSelAlt', { fg = '#b8bb26', bg = '#282828' })
+
 local function update_showtabline()
   vim.opt.showtabline = #M.worktrees > 0 and 2 or 0
 end
@@ -38,12 +43,17 @@ function M.render()
 
   local parts = {}
   for i, wt in ipairs(M.worktrees) do
-    local hl = i == current_index and '%#TabLineSel#' or '%#TabLine#'
+    local even = i % 2 == 0
+    local hl
+    if i == current_index then
+      hl = even and '%#TabLineSelAlt#' or '%#TabLineSel#'
+    else
+      hl = even and '%#TabLineAlt#' or '%#TabLine#'
+    end
     table.insert(parts, hl .. ' ' .. wt.branch .. ' [' .. wt.repo .. '] ')
   end
 
-  table.insert(parts, '%#TabLineFill#')
-  return table.concat(parts)
+  return '%#TabLineFill#%=' .. table.concat(parts)
 end
 
 _G.tabline_render = M.render
