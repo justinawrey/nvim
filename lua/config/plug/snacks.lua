@@ -3,6 +3,7 @@ local snacks = require('snacks')
 snacks.setup({
   picker = {
     enable = true,
+    main = { file = false },
   },
   lazygit = {
     enable = true,
