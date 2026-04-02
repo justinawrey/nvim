@@ -51,12 +51,24 @@ vim.opt.laststatus = 3
 
 vim.cmd('colorscheme gruvbox')
 
-vim.api.nvim_set_hl(0, 'WinBar', { fg = '#a89984', bg = '#282828' })
+vim.api.nvim_set_hl(0, 'WinBar', { fg = '#a89984', bg = 'NONE' })
+vim.api.nvim_set_hl(0, 'WinBarNC', { fg = '#a89984', bg = 'NONE' })
 -- Match signcolumn background to the editor background.
 vim.api.nvim_set_hl(0, 'SignColumn', { bg = '#282828' })
 
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config({ virtual_text = true })
+
+vim.api.nvim_create_user_command('Wc', function()
+  local tabline = require('config.tabline')
+  local current_tab = vim.api.nvim_get_current_tabpage()
+  for i, tp in ipairs(vim.api.nvim_list_tabpages()) do
+    if tp == current_tab then
+      tabline.remove(i)
+      return
+    end
+  end
+end, {})
 
 -- Control line numbers and signcolumn based on buffer type.
 local no_number = { terminal = true, nofile = true, prompt = true }
