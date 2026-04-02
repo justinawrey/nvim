@@ -52,8 +52,11 @@ vim.opt.laststatus = 3
 vim.cmd('colorscheme gruvbox')
 
 -- Swap winbar backgrounds so the active window is lighter.
-vim.api.nvim_set_hl(0, 'WinBar', { fg = '#a89984', bg = '#32302f' })
+vim.api.nvim_set_hl(0, 'WinBar', { fg = '#a89984', bg = '#282828' })
 vim.api.nvim_set_hl(0, 'WinBarNC', { fg = '#bdae93', bg = '#1d2021' })
+
+-- Match signcolumn background to the active winbar.
+vim.api.nvim_set_hl(0, 'SignColumn', { bg = '#282828' })
 
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config({ virtual_text = true })
