@@ -1,5 +1,12 @@
 local M = {}
 
+local repo_shorthands = {
+  ['goblin-client-tools'] = 'gct',
+  ['dialtone'] = 'dt',
+  ['web-clients'] = 'wc',
+  ['firespotter'] = 'fs',
+}
+
 --- Source of truth: ordered list of open worktrees.
 --- Index position corresponds to tabpage position.
 --- Each entry: { path = string, branch = string, repo = string }
@@ -30,7 +37,50 @@ local function setup_tab(path)
   })
 end
 
-function M.add(path, branch, repo)
+local function resolve_git_info(path, callback)
+  local branch, repo
+
+  local function try_finish()
+    if branch and repo then
+      vim.schedule(function()
+        callback(branch, repo)
+      end)
+    end
+  end
+
+  vim.system({ 'git', '-C', path, 'branch', '--show-current' }, {}, function(result)
+    local out = vim.trim(result.stdout or '')
+    if out ~= '' then
+      branch = out
+      try_finish()
+    else
+      vim.system({ 'git', '-C', path, 'rev-parse', '--short', 'HEAD' }, {}, function(r2)
+        branch = vim.trim(r2.stdout or '')
+        try_finish()
+      end)
+    end
+  end)
+
+  vim.system({ 'git', '-C', path, 'remote', 'get-url', 'origin' }, {}, function(result)
+    local url = vim.trim(result.stdout or '')
+    local full = url:match('([^/]+)%.git$') or url:match('([^/]+)$') or url
+    repo = repo_shorthands[full] or full
+    try_finish()
+  end)
+end
+
+function M.add(path)
+  path = vim.fn.expand(path)
+  for i, wt in ipairs(M.worktrees) do
+    if wt.path == path then
+      local tabpages = vim.api.nvim_list_tabpages()
+      if tabpages[i] then
+        vim.api.nvim_set_current_tabpage(tabpages[i])
+      end
+      return
+    end
+  end
+
   if #M.worktrees == 0 then
     setup_tab(path)
   else
@@ -38,9 +88,12 @@ function M.add(path, branch, repo)
     setup_tab(path)
   end
 
-  table.insert(M.worktrees, { path = path, branch = branch, repo = repo })
-  update_showtabline()
-  vim.cmd('redrawtabline')
+  local insert_index = #M.worktrees == 0 and 1 or vim.fn.tabpagenr()
+  resolve_git_info(path, function(branch, repo)
+    table.insert(M.worktrees, insert_index, { path = path, branch = branch, repo = repo })
+    update_showtabline()
+    vim.cmd('redrawtabline')
+  end)
 end
 
 function M.remove(index)
