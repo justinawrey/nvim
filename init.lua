@@ -31,7 +31,7 @@ require('config.winbar')
 require('config.recompile')
 require('config.notify')
 
-require('config.tabline').add(vim.loop.cwd())
+require('config.tabline')
 
 -- Do LSP setup in this order:
 --

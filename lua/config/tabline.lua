@@ -9,16 +9,23 @@ local repo_shorthands = {
 
 --- Source of truth: ordered list of open worktrees.
 --- Index position corresponds to tabpage position.
---- Each entry: { path = string, branch = string, repo = string }
-M.worktrees = {}
+--- Entry 1 is always the scratch tab: { scratch = true }
+--- Remaining entries: { path = string, branch = string, repo = string, state = string }
+M.worktrees = { { scratch = true } }
 
 -- Alternating highlight groups for legibility.
 -- Odd entries use bg1 (#3c3836), even entries use bg0 (#282828).
 vim.api.nvim_set_hl(0, 'TabLineAlt', { fg = '#7c6f64', bg = '#282828' })
 vim.api.nvim_set_hl(0, 'TabLineSelAlt', { fg = '#b8bb26', bg = '#282828' })
 
+local state_chars = {
+  idle = '',
+  thinking = 't',
+  needs_attn = '●',
+}
+
 local function update_showtabline()
-  vim.opt.showtabline = #M.worktrees > 0 and 2 or 0
+  vim.opt.showtabline = 2
 end
 
 local function setup_tab(path)
@@ -81,22 +88,29 @@ function M.add(path)
     end
   end
 
-  if #M.worktrees == 0 then
-    setup_tab(path)
-  else
-    vim.cmd('tabnew')
-    setup_tab(path)
-  end
+  vim.cmd('tabnew')
+  setup_tab(path)
 
-  local insert_index = #M.worktrees == 0 and 1 or vim.fn.tabpagenr()
+  local insert_index = vim.fn.tabpagenr()
   resolve_git_info(path, function(branch, repo)
-    table.insert(M.worktrees, insert_index, { path = path, branch = branch, repo = repo })
-    update_showtabline()
+    table.insert(M.worktrees, insert_index, { path = path, branch = branch, repo = repo, state = 'idle' })
     vim.cmd('redrawtabline')
   end)
 end
 
+function M.ch_state(index, state)
+  if not M.worktrees[index] then
+    return
+  end
+  M.worktrees[index].state = state
+  vim.cmd('redrawtabline')
+end
+
 function M.remove(index)
+  if index == 1 then
+    return
+  end
+
   local tabpages = vim.api.nvim_list_tabpages()
   local target = tabpages[index]
   if not target then
@@ -114,8 +128,41 @@ function M.remove(index)
     vim.api.nvim_set_current_tabpage(remaining[focus_index])
   end
 
-  update_showtabline()
   vim.cmd('redrawtabline')
+end
+
+function M.cd(path)
+  path = vim.fn.expand(path)
+
+  local tabpages = vim.api.nvim_list_tabpages()
+  for i, wt in ipairs(M.worktrees) do
+    if wt.path == path and tabpages[i] then
+      vim.api.nvim_set_current_tabpage(tabpages[i])
+      return
+    end
+  end
+
+  local current_tab = vim.api.nvim_get_current_tabpage()
+  local index
+  for i, tp in ipairs(tabpages) do
+    if tp == current_tab then
+      index = i
+      break
+    end
+  end
+
+  if not index or not M.worktrees[index] or M.worktrees[index].scratch then
+    return
+  end
+
+  M.worktrees[index].path = path
+  vim.cmd('tcd ' .. vim.fn.fnameescape(path))
+
+  resolve_git_info(path, function(branch, repo)
+    M.worktrees[index].branch = branch
+    M.worktrees[index].repo = repo
+    vim.cmd('redrawtabline')
+  end)
 end
 
 function M.render()
@@ -142,7 +189,15 @@ function M.render()
     else
       hl = even and '%#TabLineAlt#' or '%#TabLine#'
     end
-    table.insert(parts, hl .. ' ' .. wt.branch .. ' [' .. wt.repo .. '] ')
+    if wt.scratch then
+      table.insert(parts, hl .. ' scratch ')
+    else
+      local prefix = state_chars[wt.state] or ''
+      if prefix ~= '' then
+        prefix = prefix .. ' '
+      end
+      table.insert(parts, hl .. ' ' .. prefix .. wt.branch .. ' [' .. wt.repo .. '] ')
+    end
   end
 
   return '%#TabLineFill#%=' .. table.concat(parts)
@@ -151,5 +206,8 @@ end
 _G.tabline_render = M.render
 vim.opt.tabline = '%!v:lua.tabline_render()'
 update_showtabline()
+
+vim.api.nvim_set_current_tabpage(vim.api.nvim_list_tabpages()[1])
+setup_tab(vim.fn.expand('~/wts'))
 
 return M

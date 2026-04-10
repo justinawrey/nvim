@@ -148,33 +148,20 @@ local function open_lazygit(cmd)
         f:close()
         os.remove(tmpfile)
 
-        local resolve = vim.uv.fs_realpath
-        local current_cwd = resolve(vim.fn.getcwd()) or vim.fn.getcwd()
-        local resolved_new = resolve(new_cwd) or new_cwd
-
-        if resolved_new ~= '' and resolved_new ~= current_cwd then
-          local function cwd_matches(cwd)
-            return (resolve(cwd) or cwd) == resolved_new
-          end
-
-          local found_tab = nil
-          for tabnr = 1, vim.fn.tabpagenr('$') do
-            -- Check both tab-level cwd (tcd) and the active window's cwd,
-            -- so we also match tabs whose tcd was never set or was cleared.
-            if
-              cwd_matches(vim.fn.getcwd(-1, tabnr))
-              or cwd_matches(vim.fn.getcwd(vim.fn.tabpagewinnr(tabnr), tabnr))
-            then
-              found_tab = tabnr
+        if new_cwd ~= '' then
+          local tabline = require('config.tabline')
+          local has_tab = false
+          for _, wt in ipairs(tabline.worktrees) do
+            if wt.path == new_cwd then
+              has_tab = true
               break
             end
           end
 
-          if found_tab then
-            vim.cmd('tabn ' .. found_tab)
+          if has_tab then
+            vim.cmd('Wcd ' .. vim.fn.fnameescape(new_cwd))
           else
-            vim.cmd('tabnew')
-            vim.cmd('tcd ' .. vim.fn.fnameescape(new_cwd))
+            vim.cmd('Wa ' .. vim.fn.fnameescape(new_cwd))
           end
         end
       end
@@ -345,6 +332,8 @@ end)
 --   _G.clear_tab_attention(cwd)
 --   _G.stop_tab_spinner(cwd)
 -- end)
+
+vim.keymap.set('n', '<leader>wc', '<cmd>Wc<cr>')
 
 -- Open oil in cwd.
 vim.keymap.set('n', '<C-->', function()
