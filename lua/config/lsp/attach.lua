@@ -1,3 +1,5 @@
+vim.g.format_on_save = true
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('justin-lsp-attach', { clear = true }),
   callback = function(event)
@@ -22,6 +24,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('justin-lsp-attach', { clear = false }),
       buffer = event.buf,
       callback = function()
+        if not vim.g.format_on_save then
+          return
+        end
         vim.lsp.buf.format({
           bufnr = event.buf,
           id = client.id,

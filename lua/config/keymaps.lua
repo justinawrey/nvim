@@ -38,6 +38,12 @@ vim.keymap.set({ 'n', 'v' }, '<S-k>', '8k')
 -- Lsp format the current buffer.
 vim.keymap.set('n', 'ff', vim.lsp.buf.format)
 
+-- Toggle format on save.
+vim.keymap.set('n', '<leader>tf', function()
+  vim.g.format_on_save = not vim.g.format_on_save
+  vim.notify('Format on save: ' .. (vim.g.format_on_save and 'ON' or 'OFF'))
+end)
+
 -- Navigate through diagnostics.
 vim.keymap.set('n', '1', vim.diagnostic.goto_prev)
 vim.keymap.set('n', '2', vim.diagnostic.goto_next)
