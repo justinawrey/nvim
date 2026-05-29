@@ -1,3 +1,18 @@
+local prettier_configs = {
+  '.prettierrc',
+  '.prettierrc.json',
+  '.prettierrc.json5',
+  '.prettierrc.yml',
+  '.prettierrc.yaml',
+  '.prettierrc.toml',
+  '.prettierrc.js',
+  '.prettierrc.cjs',
+  '.prettierrc.mjs',
+  'prettier.config.js',
+  'prettier.config.cjs',
+  'prettier.config.mjs',
+}
+
 vim.lsp.config['oxfmt'] = {
   cmd = { 'oxfmt', '--lsp' },
   filetypes = {
@@ -28,9 +43,11 @@ vim.lsp.config['oxfmt'] = {
 
     local project_root = vim.fs.root(bufnr, root_markers) or vim.fn.getcwd()
 
-    -- exclude projects with .prettierrc.js (use prettierd via none-ls instead)
-    if vim.uv.fs_stat(project_root .. '/.prettierrc.js') then
-      return
+    -- exclude projects with any prettier config (use prettierd via none-ls instead)
+    for _, name in ipairs(prettier_configs) do
+      if vim.uv.fs_stat(project_root .. '/' .. name) then
+        return
+      end
     end
 
     on_dir(project_root)

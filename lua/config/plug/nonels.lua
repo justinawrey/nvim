@@ -1,6 +1,21 @@
 local nonels = require('null-ls')
 local curl = require('plenary.curl')
 
+local prettier_configs = {
+  '.prettierrc',
+  '.prettierrc.json',
+  '.prettierrc.json5',
+  '.prettierrc.yml',
+  '.prettierrc.yaml',
+  '.prettierrc.toml',
+  '.prettierrc.js',
+  '.prettierrc.cjs',
+  '.prettierrc.mjs',
+  'prettier.config.js',
+  'prettier.config.cjs',
+  'prettier.config.mjs',
+}
+
 local PORT = 6948
 local URL = 'http://127.0.0.1:' .. PORT .. '/format'
 local server_running = false
@@ -61,7 +76,7 @@ nonels.setup({
     csharpier_server,
     nonels.builtins.formatting.prettierd.with({
       runtime_condition = function(params)
-        return vim.fs.root(params.bufnr, '.prettierrc.js') ~= nil
+        return vim.fs.root(params.bufnr, prettier_configs) ~= nil
       end,
     }),
   },
