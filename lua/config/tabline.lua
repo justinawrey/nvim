@@ -9,9 +9,9 @@ local repo_shorthands = {
 
 --- Source of truth: ordered list of open worktrees.
 --- Index position corresponds to tabpage position.
---- Entry 1 is always the scratch tab: { scratch = true }
---- Remaining entries: { path = string, branch = string, repo = string, state = string }
-M.worktrees = { { scratch = true } }
+--- Each entry: { path = string, branch = string, repo = string, state = string }
+--- branch/repo are empty for non-git directories, which are labeled by folder name.
+M.worktrees = {}
 
 -- Alternating highlight groups for legibility.
 -- Odd entries use bg1 (#3c3836), even entries use bg0 (#282828).
@@ -30,6 +30,15 @@ end
 
 local function setup_tab(path)
   vim.cmd('tcd ' .. vim.fn.fnameescape(path))
+end
+
+-- Tab label: `branch [repo]` for git repos, else the folder name.
+local function label_for(wt)
+  if wt.branch and wt.branch ~= '' and wt.repo and wt.repo ~= '' then
+    return wt.branch .. ' [' .. wt.repo .. ']'
+  end
+  local path = (wt.path or ''):gsub('/+$', '')
+  return vim.fn.fnamemodify(path, ':t')
 end
 
 local function resolve_git_info(path, callback)
@@ -64,6 +73,20 @@ local function resolve_git_info(path, callback)
   end)
 end
 
+-- Insert an entry for `path` at `index`, then fill in git info asynchronously.
+-- The callback updates the entry object directly, so it stays correct even if
+-- tab indices shift before git resolves.
+local function register(path, index)
+  local entry = { path = path, branch = nil, repo = nil, state = 'idle' }
+  table.insert(M.worktrees, index, entry)
+  vim.cmd('redrawtabline')
+  resolve_git_info(path, function(branch, repo)
+    entry.branch = branch
+    entry.repo = repo
+    vim.cmd('redrawtabline')
+  end)
+end
+
 function M.add(path)
   path = vim.fn.expand(path)
   for i, wt in ipairs(M.worktrees) do
@@ -78,12 +101,7 @@ function M.add(path)
 
   vim.cmd('tabnew')
   setup_tab(path)
-
-  local insert_index = vim.fn.tabpagenr()
-  resolve_git_info(path, function(branch, repo)
-    table.insert(M.worktrees, insert_index, { path = path, branch = branch, repo = repo, state = 'idle' })
-    vim.cmd('redrawtabline')
-  end)
+  register(path, vim.fn.tabpagenr())
 end
 
 function M.ch_state(index, state)
@@ -95,11 +113,12 @@ function M.ch_state(index, state)
 end
 
 function M.remove(index)
-  if index == 1 then
+  local tabpages = vim.api.nvim_list_tabpages()
+  if #tabpages <= 1 then
+    -- Neovim always keeps at least one tab page open.
     return
   end
 
-  local tabpages = vim.api.nvim_list_tabpages()
   local target = tabpages[index]
   if not target then
     return
@@ -139,16 +158,17 @@ function M.cd(path)
     end
   end
 
-  if not index or not M.worktrees[index] or M.worktrees[index].scratch then
+  if not index or not M.worktrees[index] then
     return
   end
 
-  M.worktrees[index].path = path
+  local entry = M.worktrees[index]
+  entry.path = path
   vim.cmd('tcd ' .. vim.fn.fnameescape(path))
 
   resolve_git_info(path, function(branch, repo)
-    M.worktrees[index].branch = branch
-    M.worktrees[index].repo = repo
+    entry.branch = branch
+    entry.repo = repo
     vim.cmd('redrawtabline')
   end)
 end
@@ -177,15 +197,11 @@ function M.render()
     else
       hl = even and '%#TabLineAlt#' or '%#TabLine#'
     end
-    if wt.scratch then
-      table.insert(parts, hl .. ' scratch ')
-    else
-      local prefix = state_chars[wt.state] or ''
-      if prefix ~= '' then
-        prefix = prefix .. ' '
-      end
-      table.insert(parts, hl .. ' ' .. prefix .. wt.branch .. ' [' .. wt.repo .. '] ')
+    local prefix = state_chars[wt.state] or ''
+    if prefix ~= '' then
+      prefix = prefix .. ' '
     end
+    table.insert(parts, hl .. ' ' .. prefix .. label_for(wt) .. ' ')
   end
 
   return '%#TabLineFill#%=' .. table.concat(parts)
@@ -195,7 +211,8 @@ _G.tabline_render = M.render
 vim.opt.tabline = '%!v:lua.tabline_render()'
 update_showtabline()
 
+-- Register the initial tab as a normal entry for nvim's launch directory.
 vim.api.nvim_set_current_tabpage(vim.api.nvim_list_tabpages()[1])
-setup_tab(vim.fn.expand('~/wts'))
+register(vim.fn.getcwd(), 1)
 
 return M
