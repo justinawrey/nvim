@@ -1,0 +1,19 @@
+lazygit.yml
+  s_e3b6a364482ca9::t_1714c9b68839cd 4-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "433be6c8fd45cc0c5f1553ac30c2979d1a2ca2b2",
+  "prompts": {},
+  "sessions": {
+    "s_e3b6a364482ca9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "71aa9aed-6634-407a-8b99-49e0e1291857",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
