@@ -1,6 +1,13 @@
 -- I stuff roslyn here...
 vim.env.PATH = vim.env.PATH .. ':' .. vim.fs.normalize('~/.local/bin/roslyn')
 
+-- Claude Code turns on synchronized output (DEC mode 2026) when TERM_PROGRAM is a
+-- known terminal (ghostty, iTerm, WezTerm, ...). Inside nvim's :terminal that value
+-- is inherited from the outer terminal, so Claude batches frames -- but the actual
+-- emulator is nvim's libvterm, which renders them garbled. Unsetting it makes Claude
+-- fall back to plain rendering. Only Claude reads this var, so nothing else breaks.
+vim.env.TERM_PROGRAM = nil
+
 -- Space leader.
 -- Do this before requiring plugins because...
 -- well... I dont even know at this point :shrug:

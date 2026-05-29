@@ -1,8 +1,14 @@
 local M = {}
 
-local persistent_terms = {}
-
-function M.open_floating_win_with_term(cmd, title, persist, on_close)
+--- Open a floating-window terminal.
+--- opts:
+---   cmd      command to run (string|table) -- only used when spawning a new terminal
+---   title    window title
+---   buf      existing terminal buffer to reuse; if valid, no new process is spawned
+---   on_exit  called when the terminal process exits (spawned buffers only)
+---   on_close called whenever the floating window closes, for any reason
+--- returns { buf = number, win = number, spawned = boolean }
+function M.open_floating_win_with_term(opts)
   -- Screen dimensions
   local columns = vim.o.columns
   local lines = vim.o.lines
@@ -34,19 +40,12 @@ function M.open_floating_win_with_term(cmd, title, persist, on_close)
   vim.api.nvim_win_set_option(backdrop_win, 'winhl', 'Normal:FloatBackdrop')
   vim.api.nvim_win_set_option(backdrop_win, 'winblend', 60)
 
-  local buf
-  local spawn = false
-  if persist then
-    buf = persistent_terms[cmd]
-
-    if not buf or not vim.api.nvim_buf_is_valid(buf) then
-      buf = vim.api.nvim_create_buf(false, true)
-      persistent_terms[cmd] = buf
-      spawn = true
-    end
-  else
+  -- Reuse the given terminal buffer if it's still alive, otherwise spawn a new one.
+  local buf = opts.buf
+  local spawned = false
+  if not (buf and vim.api.nvim_buf_is_valid(buf)) then
     buf = vim.api.nvim_create_buf(false, true)
-    spawn = true
+    spawned = true
   end
 
   -- Open floating window
@@ -58,18 +57,26 @@ function M.open_floating_win_with_term(cmd, title, persist, on_close)
     row = row,
     style = 'minimal',
     border = 'rounded',
-    title = title,
+    title = opts.title,
     title_pos = 'center',
   })
 
   vim.api.nvim_set_hl(0, 'NormalFloat', { link = 'Normal' })
 
-  if spawn then
-    vim.fn.termopen(cmd, {
+  if spawned then
+    vim.fn.termopen(opts.cmd, {
       on_exit = function()
-        if vim.api.nvim_win_is_valid(floating_win) then
-          on_close()
-          vim.api.nvim_win_close(floating_win, true)
+        if opts.on_exit then
+          opts.on_exit()
+        end
+        -- Close whatever window currently shows this terminal. The buffer may have been
+        -- reopened in a new window since spawn (e.g. a reused lazygit instance), so we
+        -- can't rely on the window handle captured here, or a finished process would
+        -- leave a dead float behind.
+        for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+          if vim.api.nvim_win_is_valid(win) then
+            vim.api.nvim_win_close(win, true)
+          end
         end
       end,
     })
@@ -77,8 +84,8 @@ function M.open_floating_win_with_term(cmd, title, persist, on_close)
 
   -- IMPORTANT: enter terminal mode
   vim.cmd('startinsert')
-  --
-  -- Cleanup backdrop when main window closes
+
+  -- Cleanup backdrop (and run on_close) when the floating window closes.
   vim.api.nvim_create_autocmd('WinClosed', {
     once = true,
     pattern = tostring(floating_win),
@@ -86,10 +93,23 @@ function M.open_floating_win_with_term(cmd, title, persist, on_close)
       if vim.api.nvim_win_is_valid(backdrop_win) then
         vim.api.nvim_win_close(backdrop_win, true)
       end
+      if opts.on_close then
+        opts.on_close()
+      end
+      -- Force a full clear+repaint once the float and its backdrop have left the
+      -- layout. A near-fullscreen float with a z-indexed backdrop leaves stale
+      -- cells on the window underneath, and Neovim doesn't mark them invalid, so
+      -- a plain :redraw skips them (neovim/neovim#14922). For a :terminal buffer
+      -- underneath (e.g. Claude Code) that shows up as garbled output; only a
+      -- clear-first redraw (:redraw!, same as <C-l>) repaints it. Deferred so it
+      -- runs after the windows are actually gone.
+      vim.schedule(function()
+        vim.cmd('redraw!')
+      end)
     end,
   })
 
-  return buf
+  return { buf = buf, win = floating_win, spawned = spawned }
 end
 
 function M.open_floating_win(file, title)
@@ -150,6 +170,12 @@ function M.open_floating_win(file, title)
       if vim.api.nvim_win_is_valid(backdrop_win) then
         vim.api.nvim_win_close(backdrop_win, true)
       end
+      -- See open_floating_win_with_term: a z-indexed backdrop leaves stale cells
+      -- on the window underneath that a plain :redraw won't touch, so force a
+      -- clear-first repaint (:redraw!) once the windows are gone.
+      vim.schedule(function()
+        vim.cmd('redraw!')
+      end)
     end,
   })
 

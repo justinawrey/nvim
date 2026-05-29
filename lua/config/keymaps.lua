@@ -127,83 +127,13 @@ vim.keymap.set('n', '<C-d>', function()
   end)
 end, { silent = true })
 
--- lazygit mappings. we're doing a bit of a hack here -- removing and adding global mappings
--- when going in and out of lazygit via these keybindings. there is probably a more robust
--- way but you know what? idc
-local function open_lazygit(cmd)
-  vim.keymap.del('t', 'jj')
-
-  local tmpfile = vim.fn.tempname()
-  local config_path = vim.fn.stdpath('config') .. '/lazygit.yml'
-  local env_prefix = 'LAZYGIT_NEW_DIR_FILE=' .. vim.fn.shellescape(tmpfile) .. ' '
-  local config_flag = ' --use-config-file=' .. vim.fn.shellescape(config_path)
-  local wrapped_cmd
-  if type(cmd) == 'table' then
-    wrapped_cmd = env_prefix .. table.concat(cmd, ' ') .. config_flag
-  else
-    wrapped_cmd = env_prefix .. cmd .. config_flag
-  end
-
-  require('config.floating_win').open_floating_win_with_term(wrapped_cmd, 'lazygit', false, function()
-    vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
-
-    vim.schedule(function()
-      local f = io.open(tmpfile, 'r')
-      if f then
-        local new_cwd = f:read('*a'):gsub('%s+$', '')
-        f:close()
-        os.remove(tmpfile)
-
-        if new_cwd ~= '' then
-          local tabline = require('config.tabline')
-          local has_tab = false
-          for _, wt in ipairs(tabline.worktrees) do
-            if wt.path == new_cwd then
-              has_tab = true
-              break
-            end
-          end
-
-          if has_tab then
-            vim.cmd('Wcd ' .. vim.fn.fnameescape(new_cwd))
-          else
-            vim.cmd('Wa ' .. vim.fn.fnameescape(new_cwd))
-          end
-        end
-      end
-    end)
-  end)
-end
-
-vim.keymap.set('n', '<leader>lg', function()
-  open_lazygit('lazygit')
-end)
-
-vim.keymap.set('n', '<leader>ll', function()
-  open_lazygit('lazygit log')
-end)
-
-vim.keymap.set('n', '<leader>ls', function()
-  open_lazygit('lazygit status')
-end)
-
-vim.keymap.set('n', '<leader>lb', function()
-  open_lazygit('lazygit branch')
-end)
-
-vim.keymap.set('n', '<leader>lf', function()
-  local file = vim.api.nvim_buf_get_name(0)
-  open_lazygit({ 'lazygit', '--filter', file })
-end)
-
--- claude mappings
-vim.keymap.set('n', '<leader>n', function()
-  require('config.floating_win').open_floating_win('~/.config/daily/daily.md', 'notes')
-end)
+-- lazygit: one persistent instance per worktree. <leader>lg opens or re-shows it; <C-q>
+-- (inside lazygit) hides the window while leaving the process running. See config/lazygit.lua.
+vim.keymap.set('n', '<leader>lg', require('config.lazygit').open)
 
 -- notes mappings
-vim.keymap.set('n', '<leader>cc', function()
-  require('config.floating_win').open_floating_win_with_term('claude', 'claude', true)
+vim.keymap.set('n', '<leader>n', function()
+  require('config.floating_win').open_floating_win('~/.config/daily/daily.md', 'notes')
 end)
 
 -- Open oil in cwd of active buf.

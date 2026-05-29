@@ -89,6 +89,10 @@ end
 
 function M.add(path)
   path = vim.fn.expand(path)
+  if vim.fn.isdirectory(path) == 0 then
+    vim.notify('Wa: not a directory: ' .. path, vim.log.levels.ERROR)
+    return
+  end
   for i, wt in ipairs(M.worktrees) do
     if wt.path == path then
       local tabpages = vim.api.nvim_list_tabpages()
@@ -127,6 +131,11 @@ function M.remove(index)
   vim.api.nvim_set_current_tabpage(target)
   vim.cmd('tabclose')
 
+  local wt = M.worktrees[index]
+  if wt then
+    require('config.lazygit').close_for(wt.path)
+  end
+
   table.remove(M.worktrees, index)
 
   local focus_index = index > 1 and index - 1 or 1
@@ -140,6 +149,10 @@ end
 
 function M.cd(path)
   path = vim.fn.expand(path)
+  if vim.fn.isdirectory(path) == 0 then
+    vim.notify('Wcd: not a directory: ' .. path, vim.log.levels.ERROR)
+    return
+  end
 
   local tabpages = vim.api.nvim_list_tabpages()
   for i, wt in ipairs(M.worktrees) do
