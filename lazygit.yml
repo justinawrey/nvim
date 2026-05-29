@@ -1,6 +1,8 @@
 gui:
   sidePanelWidth: 0.15
   showCommandLog: false
+  expandFocusedSidePanel: true
+  expandedSidePanelWeight: 2
 git:
   pagers:
     - pager: delta --paging=never --side-by-side --line-numbers-left-format="" --line-numbers-right-format=""
