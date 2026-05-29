@@ -1,0 +1,58 @@
+init.lua
+  s_c90b3ba6488ec1::t_98d37d45280b61 4-10
+lua/config/floating_win.lua
+  s_0e62288847cb97::t_20201f4e9aa32f 99-108
+  s_2a804cef2df25f::t_6bfe235aa09b31 72-79
+  s_2a804cef2df25f::t_b972a1434e149c 3-11,43-46,48,60,66-67,69-71,87-88,96-97,112
+  s_0e62288847cb97::t_d082ff7749911a 173-178
+lua/config/lazygit.lua
+  s_2a804cef2df25f::t_8b67b000e8022a 65-73,81
+  s_2a804cef2df25f::t_4bcadf8c7dd10c 1-64,74-80,82-131
+lua/config/keymaps.lua
+  s_2a804cef2df25f::t_757b2cac3b5873 130-132
+  s_2a804cef2df25f::t_ccd16ba0fc6a55 134
+lua/config/tabline.lua
+  s_ac01a1dacdda88::t_e331c44eb674d6 92-95
+  s_2a804cef2df25f::t_262d73309526c2 134-138
+  s_ac01a1dacdda88::t_0a3f3589561283 152-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2a21a595432319a0b9898770310e7f2fd7f1669b",
+  "prompts": {},
+  "sessions": {
+    "s_0e62288847cb97": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d4b65820-135f-48b3-b277-fb612eb6920e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_2a804cef2df25f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af6b9e38-87e2-4a23-ab45-b3a3057420ca",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_ac01a1dacdda88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9760530f-e61c-467a-9131-c8bbd4e9f8f4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_c90b3ba6488ec1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "28cbc182-4680-49bd-9b21-5fd560dd2f34",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
