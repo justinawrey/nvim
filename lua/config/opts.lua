@@ -82,11 +82,11 @@ end, { nargs = '?' })
 
 vim.api.nvim_create_user_command('Wa', function(opts)
   require('config.tabline').add(opts.args)
-end, { nargs = 1 })
+end, { nargs = 1, complete = 'dir' })
 
 vim.api.nvim_create_user_command('Wcd', function(opts)
   require('config.tabline').cd(opts.args)
-end, { nargs = 1 })
+end, { nargs = 1, complete = 'dir' })
 
 -- Control line numbers and signcolumn based on buffer type.
 local no_number = { terminal = true, nofile = true, prompt = true }
