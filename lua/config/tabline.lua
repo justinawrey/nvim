@@ -30,18 +30,6 @@ end
 
 local function setup_tab(path)
   vim.cmd('tcd ' .. vim.fn.fnameescape(path))
-  vim.cmd('ter claude')
-  local term_win = vim.api.nvim_get_current_win()
-  Snacks.picker.explorer({
-    exclude = { '*.meta' },
-    hidden = true,
-    ignored = true,
-    layout = { layout = { width = 20, min_width = 20 } },
-    on_show = function()
-      vim.api.nvim_set_current_win(term_win)
-      vim.cmd('startinsert')
-    end,
-  })
 end
 
 local function resolve_git_info(path, callback)
