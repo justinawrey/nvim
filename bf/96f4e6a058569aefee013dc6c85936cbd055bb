@@ -1,0 +1,20 @@
+lua/config/opts.lua
+  s_ac01a1dacdda88::t_45a008dc4764d0 85
+  s_ac01a1dacdda88::t_68c575fa93faf2 89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bf96f4e6a058569aefee013dc6c85936cbd055bb",
+  "prompts": {},
+  "sessions": {
+    "s_ac01a1dacdda88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9760530f-e61c-467a-9131-c8bbd4e9f8f4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
