@@ -12,45 +12,11 @@ local function key_for(path)
   return vim.fn.fnamemodify(path, ':p')
 end
 
--- Wrap `lazygit` with the env + config the integration relies on, and hand back the
--- tempfile lazygit writes its exit-directory to (used by follow_cwd on quit).
+-- Wrap `lazygit` with the config the integration relies on.
 local function build_cmd()
-  local tmpfile = vim.fn.tempname()
   local config_path = vim.fn.stdpath('config') .. '/lazygit.yml'
-  local env_prefix = 'LAZYGIT_NEW_DIR_FILE=' .. vim.fn.shellescape(tmpfile) .. ' '
   local config_flag = ' --use-config-file=' .. vim.fn.shellescape(config_path)
-  return env_prefix .. 'lazygit' .. config_flag, tmpfile
-end
-
--- When lazygit exits after changing directory, follow it: focus the matching worktree
--- tab if we have one, otherwise open a new one.
-local function follow_cwd(tmpfile)
-  local f = io.open(tmpfile, 'r')
-  if not f then
-    return
-  end
-  local new_cwd = f:read('*a'):gsub('%s+$', '')
-  f:close()
-  os.remove(tmpfile)
-
-  if new_cwd == '' then
-    return
-  end
-
-  local tabline = require('config.tabline')
-  local has_tab = false
-  for _, wt in ipairs(tabline.worktrees) do
-    if wt.path == new_cwd then
-      has_tab = true
-      break
-    end
-  end
-
-  if has_tab then
-    vim.cmd('Wcd ' .. vim.fn.fnameescape(new_cwd))
-  else
-    vim.cmd('Wa ' .. vim.fn.fnameescape(new_cwd))
-  end
+  return 'lazygit' .. config_flag
 end
 
 -- Close the floating window but leave the terminal buffer (and its lazygit process) running.
@@ -98,13 +64,9 @@ function M.open()
   }
 
   if not existing then
-    local cmd, tmpfile = build_cmd()
-    opts.cmd = cmd
+    opts.cmd = build_cmd()
     opts.on_exit = function()
       terms[key] = nil
-      vim.schedule(function()
-        follow_cwd(tmpfile)
-      end)
     end
   end
 
