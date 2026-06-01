@@ -1,0 +1,23 @@
+lua/config/keymaps.lua
+  s_b83719ae12576a::t_c3723718df3838 130-147
+  s_b83719ae12576a::t_0129504f74fb17 228-253
+  s_b83719ae12576a::t_54aa16072e0bc9 280-284
+  s_b83719ae12576a::t_db94b11f88cf8b 262-275
+  s_b83719ae12576a::t_358b9179e482cf 227
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ae731009592f1a03286c24aa257c6c5e4d4bc48f",
+  "prompts": {},
+  "sessions": {
+    "s_b83719ae12576a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6f18c6e4-94b8-466d-8055-4e92c436a39e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
