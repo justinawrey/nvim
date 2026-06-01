@@ -1,0 +1,19 @@
+lua/config/winbar.lua
+  s_69fe18ac4fa3a7::t_2a68755e1923d7 45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a6562e9b570d1ca2df71265b79672fd7a39914b7",
+  "prompts": {},
+  "sessions": {
+    "s_69fe18ac4fa3a7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d9ce7aa-8014-41f5-9fcf-5b642fd5cc20",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
