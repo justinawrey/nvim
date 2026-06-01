@@ -42,7 +42,8 @@ function _G.relative_filename()
   end
 
   if vim.bo.buftype == 'terminal' then
-    return 'terminal'
+    local name = vim.b[buf].term_name
+    return name and ('term: ' .. name) or 'term'
   end
 
   local file_abs = vim.api.nvim_buf_get_name(0)
@@ -113,11 +114,7 @@ function _G.winbar()
     return ''
   end
 
-  return relative_filename()
-    .. ' '
-    .. buffer_git_status()
-    .. ' '
-    .. diagnostics_summary()
+  return relative_filename() .. ' ' .. buffer_git_status() .. ' ' .. diagnostics_summary()
 end
 
 vim.opt.winbar = '%{%v:lua.winbar()%}'
