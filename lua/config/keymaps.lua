@@ -127,6 +127,24 @@ vim.keymap.set('n', '<C-d>', function()
   end)
 end, { silent = true })
 
+-- Name (or rename) the current terminal so it's easy to pick out in the <leader>st
+-- picker. Normal-mode only: <leader> is the space key, so a terminal-mode map would
+-- clash with typing in the shell -- exit to normal mode (jj) first. Submitting an
+-- empty name clears it, reverting the terminal to its auto-derived label.
+vim.keymap.set('n', '<leader>tn', function()
+  if vim.bo.buftype ~= 'terminal' then
+    return
+  end
+  local buf = vim.api.nvim_get_current_buf()
+  vim.ui.input({ prompt = 'Terminal name: ', default = vim.b[buf].term_name or '' }, function(input)
+    if input == nil then
+      return
+    end
+    vim.b[buf].term_name = input ~= '' and input or nil
+    vim.notify(input ~= '' and ('Terminal named: ' .. input) or 'Terminal name cleared')
+  end)
+end)
+
 -- lazygit: one persistent instance per worktree. <leader>lg opens or re-shows it; <C-q>
 -- (inside lazygit) hides the window while leaving the process running. See config/lazygit.lua.
 vim.keymap.set('n', '<leader>lg', require('config.lazygit').open)
@@ -206,6 +224,33 @@ vim.keymap.set('n', '<leader>sg', function()
     ignored = true,
   })
 end)
+
+-- Auto-derived label for a terminal buffer, parsed from its term://{cwd}//{pid}:{cmd}
+-- name: "<folder> · <program>" (e.g. "nvim · zsh"). Falls back to 'terminal'.
+local function term_auto_label(buf)
+  local uri = vim.api.nvim_buf_get_name(buf)
+  local cwd, cmd = uri:match('^term://(.-)//%d+:(.*)$')
+  local parts = {}
+  if cwd and cwd ~= '' then
+    parts[#parts + 1] = vim.fn.fnamemodify((cwd:gsub('/+$', '')), ':t')
+  end
+  if cmd and cmd ~= '' then
+    parts[#parts + 1] = vim.fn.fnamemodify(vim.split(cmd, ' ')[1], ':t')
+  end
+  return #parts > 0 and table.concat(parts, ' · ') or 'terminal'
+end
+
+-- Display label for a terminal: the user-given name (set via <leader>tn) if any,
+-- otherwise the auto-derived label. Shared by the picker formatter and its search
+-- transform so the displayed name and the searchable text never drift.
+local function term_label(buf)
+  local name = vim.b[buf].term_name
+  if name and name ~= '' then
+    return name
+  end
+  return term_auto_label(buf)
+end
+
 vim.keymap.set('n', '<leader>st', function()
   local function startswith(str, prefix)
     return str:sub(1, #prefix) == prefix
@@ -214,11 +259,29 @@ vim.keymap.set('n', '<leader>st', function()
   Snacks.picker({
     title = 'Terminals',
     finder = 'buffers',
-    format = 'buffer',
+    format = function(item)
+      local ret = {}
+      ret[#ret + 1] = { Snacks.picker.util.align(tostring(item.buf), 3), 'SnacksPickerBufNr' }
+      ret[#ret + 1] = { ' ' }
+      ret[#ret + 1] = { vim.fn.nr2char(0xf489) .. ' ', 'Special' } -- terminal icon
+      ret[#ret + 1] = { term_label(item.buf) }
+      local named = vim.b[item.buf].term_name
+      if named and named ~= '' then
+        -- keep the folder/command context beside an explicitly named terminal
+        ret[#ret + 1] = { '  ' }
+        ret[#ret + 1] = { term_auto_label(item.buf), 'SnacksPickerDir' }
+      end
+      return ret
+    end,
     hidden = false,
     unloaded = true,
     current = true,
     sort_lastused = true,
+    -- fold the label into the matched text so typing a name filters to it
+    transform = function(item)
+      item.text = term_label(item.buf) .. ' ' .. (item.text or '')
+      return item
+    end,
     filter = {
       filter = function(item)
         return startswith(item.file, 'term://')
