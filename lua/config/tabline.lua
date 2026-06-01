@@ -228,4 +228,60 @@ update_showtabline()
 vim.api.nvim_set_current_tabpage(vim.api.nvim_list_tabpages()[1])
 register(vim.fn.getcwd(), 1)
 
+-- Keep a tabpage alive when its last window closes.
+--
+-- Each tabpage is a persistent workspace whose only sanctioned exit is :Wc,
+-- which also drops the M.worktrees entry and the tab's lazygit instance.
+-- Neovim's default is to collapse a tabpage the moment its last window closes
+-- -- via :q, :close, <C-w>c, etc. -- and jump to a neighbouring tabpage, which
+-- silently breaks the 1:1 tabpage <-> worktree mapping this module relies on.
+--
+-- WinClosed fires while the closing window and its tabpage are both still
+-- valid, for every close path (including plugin-driven nvim_win_close). When
+-- the window being closed is the last ordinary (non-floating) window of a
+-- tabpage -- and it isn't the only tabpage -- we splice in a throwaway scratch
+-- window and let the original close finish, so the tabpage stays put showing an
+-- empty scratch buffer instead of disappearing.
+--
+-- :qall / :wqall still exit: Neovim tears windows down during shutdown without
+-- routing through this WinClosed path, so the rescue never fires then. A plain
+-- :q on the final remaining tabpage also still quits (guarded below), matching
+-- :Wc's own refusal to close the last workspace.
+vim.api.nvim_create_autocmd('WinClosed', {
+  nested = true, -- let the scratch window run the usual Buf/WinEnter autocmds
+  callback = function(args)
+    local win = tonumber(args.match)
+    if not win or not vim.api.nvim_win_is_valid(win) then
+      return
+    end
+    -- A floating window closing never collapses a tabpage.
+    if vim.api.nvim_win_get_config(win).relative ~= '' then
+      return
+    end
+    local tabpage = vim.api.nvim_win_get_tabpage(win)
+    if not vim.api.nvim_tabpage_is_valid(tabpage) then
+      return
+    end
+    -- Leave the final tabpage to its default behaviour (nothing to switch to).
+    if #vim.api.nvim_list_tabpages() <= 1 then
+      return
+    end
+    -- If other ordinary windows remain in this tabpage, it's a normal window
+    -- close, not a tabpage collapse -- let it happen.
+    local others = vim.tbl_filter(function(w)
+      return w ~= win and vim.api.nvim_win_get_config(w).relative == ''
+    end, vim.api.nvim_tabpage_list_wins(tabpage))
+    if #others > 0 then
+      return
+    end
+    -- Last ordinary window: open a scratch window beside it, then close the
+    -- original. The close is non-force, so a modified buffer is preserved
+    -- (hidden) exactly as a normal :q would leave it.
+    local scratch = vim.api.nvim_create_buf(false, true)
+    vim.bo[scratch].bufhidden = 'wipe'
+    vim.api.nvim_open_win(scratch, true, { split = 'right', win = win })
+    pcall(vim.api.nvim_win_close, win, false)
+  end,
+})
+
 return M

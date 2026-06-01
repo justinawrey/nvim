@@ -47,6 +47,11 @@ function _G.relative_filename()
   end
 
   local file_abs = vim.api.nvim_buf_get_name(0)
+  -- Unnamed buffers (e.g. the scratch buffer left behind when a tabpage's last
+  -- window is closed) have no path to show.
+  if file_abs == '' then
+    return ''
+  end
   local cwd_abs = vim.loop.cwd()
 
   return relative_path(cwd_abs, file_abs)
