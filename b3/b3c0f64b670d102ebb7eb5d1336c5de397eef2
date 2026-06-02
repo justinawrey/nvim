@@ -1,0 +1,20 @@
+lua/config/floating_win.lua
+  s_c68d8c3602ddab::t_58964f9246c477 171-173
+  s_c68d8c3602ddab::t_d481dea8a4dee4 99-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b3b3c0f64b670d102ebb7eb5d1336c5de397eef2",
+  "prompts": {},
+  "sessions": {
+    "s_c68d8c3602ddab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d96d645a-002b-45ea-ab59-884c676660e9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
