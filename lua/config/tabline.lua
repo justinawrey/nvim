@@ -13,6 +13,11 @@ local repo_shorthands = {
 --- branch/repo are empty for non-git directories, which are labeled by folder name.
 M.worktrees = {}
 
+-- Set by M.remove for the duration of its :tabclose so the WinClosed rescue
+-- autocmd (which otherwise keeps tabpages alive when their last window closes)
+-- stands down and lets the sanctioned close actually collapse the tabpage.
+local closing = false
+
 -- Alternating highlight groups for legibility.
 -- Odd entries use bg1 (#3c3836), even entries use bg0 (#282828).
 vim.api.nvim_set_hl(0, 'TabLineAlt', { fg = '#7c6f64', bg = '#282828' })
@@ -128,10 +133,14 @@ function M.remove(index)
     return
   end
 
-  vim.api.nvim_set_current_tabpage(target)
-  vim.cmd('tabclose')
-
   local wt = M.worktrees[index]
+
+  -- Raise the guard so the WinClosed rescue lets this tabpage collapse.
+  closing = true
+  vim.api.nvim_set_current_tabpage(target)
+  pcall(vim.cmd, 'tabclose')
+  closing = false
+
   if wt then
     require('config.lazygit').close_for(wt.path)
   end
@@ -250,6 +259,10 @@ register(vim.fn.getcwd(), 1)
 vim.api.nvim_create_autocmd('WinClosed', {
   nested = true, -- let the scratch window run the usual Buf/WinEnter autocmds
   callback = function(args)
+    -- M.remove is intentionally collapsing this tabpage; don't rescue it.
+    if closing then
+      return
+    end
     local win = tonumber(args.match)
     if not win or not vim.api.nvim_win_is_valid(win) then
       return
