@@ -96,16 +96,14 @@ function M.open_floating_win_with_term(opts)
       if opts.on_close then
         opts.on_close()
       end
-      -- Force a full clear+repaint once the float and its backdrop have left the
-      -- layout. A near-fullscreen float with a z-indexed backdrop leaves stale
-      -- cells on the window underneath, and Neovim doesn't mark them invalid, so
-      -- a plain :redraw skips them (neovim/neovim#14922). For a :terminal buffer
-      -- underneath (e.g. Claude Code) that shows up as garbled output; only a
-      -- clear-first redraw (:redraw!, same as <C-l>) repaints it. Deferred so it
-      -- runs after the windows are actually gone.
-      vim.schedule(function()
-        vim.cmd('redraw!')
-      end)
+      -- Deliberately NO forced :redraw! here. The original artifact this guarded
+      -- against (a z-indexed, winblend'd backdrop leaving stale cells on the
+      -- window underneath -- neovim/neovim#14922) is gone on current Neovim:
+      -- once the float and backdrop leave the layout, Neovim invalidates and
+      -- repaints the covered region on its own, including a :terminal underneath
+      -- (verified by capturing the composited screen). A forced clear+repaint is
+      -- not just unnecessary -- it re-emits the whole grid for a live :terminal
+      -- like Claude Code, which can itself leave it garbled until it next draws.
     end,
   })
 
@@ -170,12 +168,9 @@ function M.open_floating_win(file, title)
       if vim.api.nvim_win_is_valid(backdrop_win) then
         vim.api.nvim_win_close(backdrop_win, true)
       end
-      -- See open_floating_win_with_term: a z-indexed backdrop leaves stale cells
-      -- on the window underneath that a plain :redraw won't touch, so force a
-      -- clear-first repaint (:redraw!) once the windows are gone.
-      vim.schedule(function()
-        vim.cmd('redraw!')
-      end)
+      -- No forced :redraw! (see open_floating_win_with_term): Neovim repaints the
+      -- area the blended backdrop covered on its own, and forcing a clear+repaint
+      -- can garble a live :terminal underneath instead of helping.
     end,
   })
 
