@@ -1,0 +1,21 @@
+lua/config/tabline.lua
+  s_c68d8c3602ddab::t_207805f67cc40e 136-139,141-142
+  s_c68d8c3602ddab::t_41d3e7dd0c4e5a 262-265
+  s_c68d8c3602ddab::t_6b92a7b3254ed9 16-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7fb52dd7aa3ba87aa163ac31f6638575cb81aee6",
+  "prompts": {},
+  "sessions": {
+    "s_c68d8c3602ddab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d96d645a-002b-45ea-ab59-884c676660e9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
