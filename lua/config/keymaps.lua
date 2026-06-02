@@ -228,6 +228,9 @@ end)
 -- Auto-derived label for a terminal buffer, parsed from its term://{cwd}//{pid}:{cmd}
 -- name: "<folder> · <program>" (e.g. "nvim · zsh"). Falls back to 'terminal'.
 local function term_auto_label(buf)
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return 'terminal'
+  end
   local uri = vim.api.nvim_buf_get_name(buf)
   local cwd, cmd = uri:match('^term://(.-)//%d+:(.*)$')
   local parts = {}
@@ -240,15 +243,23 @@ local function term_auto_label(buf)
   return #parts > 0 and table.concat(parts, ' · ') or 'terminal'
 end
 
--- Display label for a terminal: the user-given name (set via <leader>tn) if any,
--- otherwise the auto-derived label. Shared by the picker formatter and its search
--- transform so the displayed name and the searchable text never drift.
-local function term_label(buf)
-  local name = vim.b[buf].term_name
-  if name and name ~= '' then
-    return name
+-- The explicit user-set name for a terminal buffer (set via <leader>tn), or nil if
+-- unnamed. Guards against invalid buffer ids: deleting a terminal from the <leader>st
+-- picker wipes its buffer, yet the picker may re-render the stale item before its async
+-- refresh drops it -- reading vim.b on the dead id would throw "Invalid buffer id".
+local function term_name(buf)
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return nil
   end
-  return term_auto_label(buf)
+  local name = vim.b[buf].term_name
+  return name ~= '' and name or nil
+end
+
+-- Display label for a terminal: the user-given name if any, otherwise the auto-derived
+-- label. Shared by the picker formatter and its search transform so the displayed name
+-- and the searchable text never drift.
+local function term_label(buf)
+  return term_name(buf) or term_auto_label(buf)
 end
 
 vim.keymap.set('n', '<leader>st', function()
@@ -265,8 +276,8 @@ vim.keymap.set('n', '<leader>st', function()
       ret[#ret + 1] = { ' ' }
       ret[#ret + 1] = { vim.fn.nr2char(0xf489) .. ' ', 'Special' } -- terminal icon
       ret[#ret + 1] = { term_label(item.buf) }
-      local named = vim.b[item.buf].term_name
-      if named and named ~= '' then
+      local named = term_name(item.buf)
+      if named then
         -- keep the folder/command context beside an explicitly named terminal
         ret[#ret + 1] = { '  ' }
         ret[#ret + 1] = { term_auto_label(item.buf), 'SnacksPickerDir' }
