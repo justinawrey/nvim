@@ -1,6 +1,3 @@
--- I stuff roslyn here...
-vim.env.PATH = vim.env.PATH .. ':' .. vim.fs.normalize('~/.local/bin/roslyn')
-
 -- Claude Code turns on synchronized output (DEC mode 2026) when TERM_PROGRAM is a
 -- known terminal (ghostty, iTerm, WezTerm, ...). Inside nvim's :terminal that value
 -- is inherited from the outer terminal, so Claude batches frames -- but the actual
