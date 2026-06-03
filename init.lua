@@ -45,9 +45,8 @@ require('config.notify')
 -- 1. Define 'LspAttach' autocmd
 --
 -- NOTE: if you're going to use two LSPs for the same
--- filetypes like im doing here with lua_language_server + stylua
--- and roslyn + csharpier via nonels, make sure to not
--- double attach in config.lsp.attach.
+-- filetypes like im doing here with lua_language_server + stylua,
+-- make sure to not double attach in config.lsp.attach.
 require('config.lsp.common')
 require('config.lsp.eslint')
 require('config.lsp.lua')
