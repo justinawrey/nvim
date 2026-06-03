@@ -10,7 +10,7 @@ blink.setup({
     ['<C-k>'] = { 'select_prev', 'fallback' },
   },
   completion = {
-    documentation = { auto_show = true, auto_show_delay_ms = 0 },
+    documentation = { auto_show = true, auto_show_delay_ms = 300 },
   },
 
   cmdline = {
