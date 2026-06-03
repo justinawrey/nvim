@@ -207,6 +207,28 @@ local picker_ignore = {
   '*.anim',
 }
 
+local function picker_include_dirs()
+  local root = Snacks.git.get_root() or vim.fn.getcwd()
+  local include_file = vim.fs.joinpath(root, '.pickerinclude')
+
+  if vim.uv.fs_stat(include_file) == nil then
+    return nil
+  end
+
+  local dirs = {}
+  for line in io.lines(include_file) do
+    line = vim.trim(line)
+    if line ~= '' then
+      local dir = vim.fs.joinpath(root, line)
+      if vim.uv.fs_stat(dir) ~= nil then
+        dirs[#dirs + 1] = dir
+      end
+    end
+  end
+
+  return #dirs > 0 and dirs or nil
+end
+
 vim.keymap.set('n', '<leader><space>', function()
   Snacks.picker.buffers({
     win = {
@@ -223,6 +245,7 @@ vim.keymap.set('n', '<leader><space>', function()
 end)
 vim.keymap.set('n', '<leader>sf', function()
   Snacks.picker.files({
+    dirs = picker_include_dirs(),
     exclude = picker_ignore,
     hidden = false,
     ignored = false,
@@ -251,6 +274,7 @@ vim.keymap.set('n', '<leader>se', function()
 end)
 vim.keymap.set('n', '<leader>sg', function()
   Snacks.picker.grep({
+    dirs = picker_include_dirs(),
     exclude = picker_ignore,
     hidden = false,
     ignored = false,
