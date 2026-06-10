@@ -1,0 +1,19 @@
+lua/config/lsp/ts.lua
+  s_6d41b4e30ded19::t_ef9bdd7e01826d 110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "20d671ac1f98cad44a75142ec82e1c8cb7249656",
+  "prompts": {},
+  "sessions": {
+    "s_6d41b4e30ded19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3d630f4-853e-4926-946e-fd7400de7e9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
