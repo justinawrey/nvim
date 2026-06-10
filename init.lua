@@ -51,7 +51,6 @@ require('config.tabline')
 -- and roslyn + csharpier via nonels, make sure to not
 -- double attach in config.lsp.attach.
 require('config.lsp.common')
-require('config.lsp.oxfmt')
 require('config.lsp.eslint')
 require('config.lsp.lua')
 require('config.lsp.md')
