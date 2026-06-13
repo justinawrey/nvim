@@ -207,26 +207,29 @@ local picker_ignore = {
   '*.anim',
 }
 
-local function picker_include_dirs()
+local function picker_include_paths()
   local root = Snacks.git.get_root() or vim.fn.getcwd()
   local include_file = vim.fs.joinpath(root, '.pickerinclude')
 
   if vim.uv.fs_stat(include_file) == nil then
-    return nil
+    return nil, false
   end
 
-  local dirs = {}
+  local paths = {}
+  local has_file = false
   for line in io.lines(include_file) do
     line = vim.trim(line)
     if line ~= '' then
-      local dir = vim.fs.joinpath(root, line)
-      if vim.uv.fs_stat(dir) ~= nil then
-        dirs[#dirs + 1] = dir
+      local path = vim.fs.normalize(vim.fs.joinpath(root, line))
+      local stat = vim.uv.fs_stat(path)
+      if stat ~= nil then
+        paths[#paths + 1] = path
+        has_file = has_file or stat.type == 'file'
       end
     end
   end
 
-  return #dirs > 0 and dirs or nil
+  return #paths > 0 and paths or nil, has_file
 end
 
 vim.keymap.set('n', '<leader><space>', function()
@@ -244,8 +247,11 @@ vim.keymap.set('n', '<leader><space>', function()
   })
 end)
 vim.keymap.set('n', '<leader>sf', function()
+  local include_paths, include_has_file = picker_include_paths()
   Snacks.picker.files({
-    dirs = picker_include_dirs(),
+    dirs = include_paths,
+    -- fd only accepts directories as search roots; rg also accepts individual files.
+    cmd = include_has_file and 'rg' or nil,
     exclude = picker_ignore,
     hidden = false,
     ignored = false,
@@ -273,8 +279,9 @@ vim.keymap.set('n', '<leader>se', function()
   })
 end)
 vim.keymap.set('n', '<leader>sg', function()
+  local include_paths = picker_include_paths()
   Snacks.picker.grep({
-    dirs = picker_include_dirs(),
+    dirs = include_paths,
     exclude = picker_ignore,
     hidden = false,
     ignored = false,
