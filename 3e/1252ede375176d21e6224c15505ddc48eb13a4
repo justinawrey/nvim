@@ -1,0 +1,108 @@
+lua/config/scratch.lua
+  s_8e63b35461940c::t_ede80f4941beaf 37-38,59-62
+  s_8e63b35461940c::t_cb41026c53a0ff 1-36,39-58,63-66
+lua/config/lazygit.lua
+  s_62dbe8311e54c9::t_2ef4b874a73312 16-21,25
+  s_c5fcb9bc0c38f2::t_3c851d4b240079 28
+  s_c5fcb9bc0c38f2::t_1e17adcdf72d43 8
+lua/config/tabline.lua
+  s_450e464612485b::t_f43cf385abd93e 21-27,32-39
+  s_450e464612485b::t_24087cfcc4bc4a 28-31
+lua/config/floating_win.lua
+  s_8e63b35461940c::t_2cd2fa4f159b9a 3-6,10-11,23-32,37-52,69,71,98,103,128,156-157
+  s_c5fcb9bc0c38f2::t_da7c7da89097f5 34,62,85-88,101,112
+lua/config/keymaps.lua
+  s_a2717309e7a291::t_892829d4c6f882 249-250
+  s_a2717309e7a291::t_95cea75824c1a5 336-337
+  s_898a7521e9d4d9::t_89e99c0731cff6 244-245
+  s_1a8993eb260341::t_bac38290d39624 218-220,225-227
+  s_898a7521e9d4d9::t_f635f52282b95e 216-217
+  s_a2717309e7a291::t_e5d4c5aa2bd039 221-222
+  s_0f993661094d9f::t_170f8750c3a986 223-224
+  s_a2717309e7a291::t_136d9a7a499a67 205-206
+  s_0f993661094d9f::t_2ffc2b4477e268 251-252
+  s_8e63b35461940c::t_3029db5874fc5f 31-39
+  s_1a8993eb260341::t_ff7cd28a7f66a7 246-248,253-255
+lazygit.yml
+  s_ab70f0379cbea3::t_d027a0c678e785 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "3e1252ede375176d21e6224c15505ddc48eb13a4",
+  "prompts": {},
+  "sessions": {
+    "s_0f993661094d9f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b231dd79-8337-4556-a708-8357bf078774",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_1a8993eb260341": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb8fecc4-84a3-42ac-8cb8-451995d35780",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_450e464612485b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4dee2dc-3c17-47f2-8e11-03366b75f829",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_62dbe8311e54c9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "71b1b3f8-3a7d-4869-8208-3836d13eb48f",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_898a7521e9d4d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "428db205-adc1-4757-8ff3-b4632619470a",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_8e63b35461940c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be4ffc39-8a95-4a26-85bd-a87da6693f4d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_a2717309e7a291": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d16d6d30-4951-4462-a8cb-789fa701c5ca",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_ab70f0379cbea3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8766ad8b-12e0-4ab7-aa81-eb0484b02940",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    },
+    "s_c5fcb9bc0c38f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be14e80e-cbf2-4279-a918-b993ab97576f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Justin Awrey <awreyjustin@gmail.com>"
+    }
+  }
+}
