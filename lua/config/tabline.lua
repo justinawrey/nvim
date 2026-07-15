@@ -18,10 +18,25 @@ M.worktrees = {}
 -- stands down and lets the sanctioned close actually collapse the tabpage.
 local closing = false
 
--- Alternating highlight groups for legibility.
--- Odd entries use bg1 (#3c3836), even entries use bg0 (#282828).
-vim.api.nvim_set_hl(0, 'TabLineAlt', { fg = '#7c6f64', bg = '#282828' })
-vim.api.nvim_set_hl(0, 'TabLineSelAlt', { fg = '#b8bb26', bg = '#282828' })
+-- Alternating highlight groups for legibility. Even entries get the "Alt"
+-- groups, which use bg0 to contrast against the colorscheme's default TabLine
+-- background (bg1). The palette is background-aware so the alternation stays
+-- legible in both light and dark gruvbox, and is re-applied on every
+-- ColorScheme event (which also fires when `background` flips).
+local function set_alt_highlights()
+  local palette = vim.o.background == 'light'
+      -- Light gruvbox (hard): light0_soft bg (a touch darker than light0_hard,
+      -- still lighter than the default TabLine's light1 bg), dark_green_hard
+      -- sel for stronger contrast against that bg.
+      and { bg = '#f2e5bc', fg = '#7c6f64', sel = '#5a633a' }
+      -- Dark gruvbox (hard): bg0 #282828, gray fg #7c6f64, green sel #b8bb26.
+      or { bg = '#282828', fg = '#7c6f64', sel = '#b8bb26' }
+  vim.api.nvim_set_hl(0, 'TabLineAlt', { fg = palette.fg, bg = palette.bg })
+  vim.api.nvim_set_hl(0, 'TabLineSelAlt', { fg = palette.sel, bg = palette.bg })
+end
+
+set_alt_highlights()
+vim.api.nvim_create_autocmd('ColorScheme', { callback = set_alt_highlights })
 
 local state_chars = {
   idle = '',

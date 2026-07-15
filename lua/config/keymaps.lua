@@ -28,6 +28,15 @@ vim.api.nvim_create_user_command('T', function(args)
   vim.cmd('Vt ' .. args.args)
 end, { nargs = '?' })
 
+-- Scratch terminal: a single, lazily-created terminal shown in a full-screen floating
+-- window. <leader>tt or :tt opens/re-shows it (reusing the same shell); <C-q> inside it
+-- hides the window while leaving the shell running. See config/scratch.lua.
+vim.keymap.set('n', '<leader>tt', require('config.scratch').open)
+vim.api.nvim_create_user_command('Tt', require('config.scratch').open, {})
+-- User commands must be capitalized, so :tt can't be one directly. Expand a bare `tt`
+-- command line to :Tt -- only when it's the entire command (not e.g. `set tt`).
+vim.cmd([[cnoreabbrev <expr> tt (getcmdtype() ==# ':' && getcmdline() ==# 'tt') ? 'Tt' : 'tt']])
+
 -- Easier exiting insert mode.
 vim.keymap.set('i', 'jj', '<Esc>')
 
@@ -193,6 +202,8 @@ vim.keymap.set('n', '<leader><space>', function()
       input = {
         keys = {
           ['<c-x>'] = false,
+          -- default <c-q> sends the picker results to the quickfix list; just close instead
+          ['<c-q>'] = { 'close', mode = { 'n', 'i' } },
           ['<c-d>'] = { 'bufdelete', mode = { 'n', 'i' } },
         },
       },
@@ -202,8 +213,18 @@ end)
 vim.keymap.set('n', '<leader>sf', function()
   Snacks.picker.files({
     exclude = picker_ignore,
-    hidden = true,
-    ignored = true,
+    hidden = false,
+    ignored = false,
+    win = {
+      input = {
+        keys = {
+          -- default <c-q> sends the picker results to the quickfix list; just close instead
+          ['<c-q>'] = { 'close', mode = { 'n', 'i' } },
+          ['<c-h>'] = { 'toggle_hidden', mode = { 'n', 'i' } },
+          ['<c-i>'] = { 'toggle_ignored', mode = { 'n', 'i' } },
+        },
+      },
+    },
   })
 end)
 vim.keymap.set('n', '<leader>sd', function()
@@ -220,8 +241,18 @@ end)
 vim.keymap.set('n', '<leader>sg', function()
   Snacks.picker.grep({
     exclude = picker_ignore,
-    hidden = true,
-    ignored = true,
+    hidden = false,
+    ignored = false,
+    win = {
+      input = {
+        keys = {
+          -- default <c-q> sends the picker results to the quickfix list; just close instead
+          ['<c-q>'] = { 'close', mode = { 'n', 'i' } },
+          ['<c-h>'] = { 'toggle_hidden', mode = { 'n', 'i' } },
+          ['<c-i>'] = { 'toggle_ignored', mode = { 'n', 'i' } },
+        },
+      },
+    },
   })
 end)
 
@@ -302,6 +333,8 @@ vim.keymap.set('n', '<leader>st', function()
       input = {
         keys = {
           ['<c-x>'] = false,
+          -- default <c-q> sends the picker results to the quickfix list; just close instead
+          ['<c-q>'] = { 'close', mode = { 'n', 'i' } },
           ['<c-d>'] = { 'bufdelete', mode = { 'n', 'i' } },
         },
       },

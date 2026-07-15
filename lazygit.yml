@@ -1,5 +1,5 @@
 gui:
-  sidePanelWidth: 0.15
+  sidePanelWidth: 0.20
   showCommandLog: false
   expandFocusedSidePanel: true
   expandedSidePanelWeight: 2

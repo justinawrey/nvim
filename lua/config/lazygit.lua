@@ -5,7 +5,7 @@ local M = {}
 -- Worktree root (normalized cwd) -> terminal buffer running that worktree's lazygit.
 local terms = {}
 
--- The floating window currently showing lazygit, if any.
+-- The window currently showing lazygit, if any.
 local current_win = nil
 
 local function key_for(path)
@@ -13,13 +13,19 @@ local function key_for(path)
 end
 
 -- Wrap `lazygit` with the config the integration relies on.
+--
+-- termopen runs this through a non-interactive shell (`zsh -c "..."`), which never
+-- sources ~/.zshrc, so fnm's `--use-on-cd` hook never fires and lazygit inherits
+-- whatever node version happened to be active when Neovim itself was started. Re-run
+-- fnm's version resolution here so lazygit (and anything node-based it shells out to,
+-- e.g. husky/lint-staged hooks) picks up the version pinned by the cwd's .nvmrc.
 local function build_cmd()
   local config_path = vim.fn.stdpath('config') .. '/lazygit.yml'
   local config_flag = ' --use-config-file=' .. vim.fn.shellescape(config_path)
-  return 'lazygit' .. config_flag
+  return 'eval "$(fnm env --shell zsh)"; fnm use >/dev/null 2>&1; exec lazygit' .. config_flag
 end
 
--- Close the floating window but leave the terminal buffer (and its lazygit process) running.
+-- Close the window but leave the terminal buffer (and its lazygit process) running.
 function M.hide()
   if current_win and vim.api.nvim_win_is_valid(current_win) then
     vim.api.nvim_win_close(current_win, true)
@@ -55,7 +61,6 @@ function M.open()
   pcall(vim.keymap.del, 't', 'jj')
 
   local opts = {
-    title = 'lazygit',
     buf = existing,
     on_close = function()
       pcall(vim.keymap.set, 't', 'jj', [[<C-\><C-n>]])
