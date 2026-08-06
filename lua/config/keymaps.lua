@@ -30,9 +30,9 @@ vim.api.nvim_create_user_command('T', function(args)
 end, { nargs = '?' })
 
 -- Scratch terminal: a single, lazily-created terminal shown in a full-screen floating
--- window. <leader>tt or :tt opens/re-shows it (reusing the same shell); <C-q> inside it
+-- window. <leader>x or :tt opens/re-shows it (reusing the same shell); <C-q> inside it
 -- hides the window while leaving the shell running. See config/scratch.lua.
-vim.keymap.set('n', '<leader>tt', require('config.scratch').open)
+vim.keymap.set('n', '<leader>x', require('config.scratch').open)
 vim.api.nvim_create_user_command('Tt', require('config.scratch').open, {})
 -- User commands must be capitalized, so :tt can't be one directly. Expand a bare `tt`
 -- command line to :Tt -- only when it's the entire command (not e.g. `set tt`).
@@ -49,7 +49,7 @@ vim.keymap.set({ 'n', 'v' }, '<S-k>', '8k')
 vim.keymap.set('n', 'ff', vim.lsp.buf.format)
 
 -- Toggle format on save.
-vim.keymap.set('n', '<leader>tf', function()
+vim.keymap.set('n', '<leader>fs', function()
   vim.g.format_on_save = not vim.g.format_on_save
   vim.notify('Format on save: ' .. (vim.g.format_on_save and 'ON' or 'OFF'))
 end)
@@ -151,11 +151,11 @@ vim.keymap.set('n', '<C-d>', function()
   end)
 end, { silent = true })
 
--- Name (or rename) the current terminal so it's easy to pick out in the <leader>st
+-- Name (or rename) the current terminal so it's easy to pick out in the <leader>t
 -- picker. Normal-mode only: <leader> is the space key, so a terminal-mode map would
 -- clash with typing in the shell -- exit to normal mode (jj) first. Submitting an
 -- empty name clears it, reverting the terminal to its auto-derived label.
-vim.keymap.set('n', '<leader>tn', function()
+vim.keymap.set('n', '<leader>n', function()
   if vim.bo.buftype ~= 'terminal' then
     return
   end
@@ -174,7 +174,7 @@ end)
 vim.keymap.set('n', '<leader>lg', require('config.lazygit').open)
 
 -- notes mappings
-vim.keymap.set('n', '<leader>n', function()
+vim.keymap.set('n', '<leader>b', function()
   require('config.floating_win').open_floating_win('~/.config/daily/daily.md', 'notes')
 end)
 
@@ -289,8 +289,8 @@ local function term_auto_label(buf)
   return #parts > 0 and table.concat(parts, ' · ') or 'terminal'
 end
 
--- The explicit user-set name for a terminal buffer (set via <leader>tn), or nil if
--- unnamed. Guards against invalid buffer ids: deleting a terminal from the <leader>st
+-- The explicit user-set name for a terminal buffer (set via <leader>n), or nil if
+-- unnamed. Guards against invalid buffer ids: deleting a terminal from the <leader>t
 -- picker wipes its buffer, yet the picker may re-render the stale item before its async
 -- refresh drops it -- reading vim.b on the dead id would throw "Invalid buffer id".
 local function term_name(buf)
@@ -325,7 +325,7 @@ local function find_win_with_buf(buf)
   return nil
 end
 
-vim.keymap.set('n', '<leader>st', function()
+vim.keymap.set('n', '<leader>t', function()
   local function startswith(str, prefix)
     return str:sub(1, #prefix) == prefix
   end

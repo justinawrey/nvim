@@ -53,7 +53,7 @@ function M.open()
 
   if result.spawned then
     scratch_buf = result.buf
-    -- Label it 'scratch' so it stands out in the <leader>st terminal picker
+    -- Label it 'scratch' so it stands out in the <leader>t terminal picker
     -- (see config/keymaps.lua term_name/term_label).
     vim.b[result.buf].term_name = 'scratch'
     -- Hide (keeping the shell running) with <C-q>. Mapped in both terminal and normal
