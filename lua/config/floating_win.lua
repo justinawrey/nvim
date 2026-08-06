@@ -1,3 +1,5 @@
+local monitor = require('config.monitor')
+
 local M = {}
 
 -- Open a dimmed, click-through backdrop covering the whole editor, so a floating window
@@ -27,20 +29,22 @@ end
 --- opts:
 ---   cmd      command to run (string|table) -- only used when spawning a new terminal
 ---   buf      existing terminal buffer to reuse; if valid, no new process is spawned
----   float    when true, a centered, bordered window over a dimmed backdrop; otherwise
+---   float    when true, a bordered window over a dimmed backdrop, centered on the
+---            monitor holding the active window (see config/monitor.lua); otherwise
 ---            a borderless window covering the whole editor (minus the command line)
 ---   title    window title (float layout only)
 ---   on_exit  called when the terminal process exits (spawned buffers only)
 ---   on_close called whenever the window closes, for any reason
 --- returns { buf = number, win = number, spawned = boolean }
 function M.open_floating_win_with_term(opts)
-  -- Geometry depends on the layout: a centered ~full-size float, or a borderless
+  -- Geometry depends on the layout: a float filling most of one monitor, or a borderless
   -- window covering the whole editor.
   local width, height, col, row, border, backdrop_win
   if opts.float then
-    width = math.floor(vim.o.columns * 0.98)
+    -- Resolve the monitor before the backdrop exists, while the current window is still
+    -- the user's.
+    width, col = monitor.centered_width_col(0.98)
     height = math.floor(vim.o.lines * 0.9)
-    col = math.floor((vim.o.columns - width) / 2)
     row = math.floor((vim.o.lines - height) / 2 - 1)
     border = 'rounded'
     backdrop_win = open_backdrop()
@@ -113,17 +117,12 @@ function M.open_floating_win_with_term(opts)
 end
 
 function M.open_floating_win(file, title)
-  -- Screen dimensions
-  local columns = vim.o.columns
-  local lines = vim.o.lines
-
-  -- Window size (80%)
-  local width = math.floor(columns * 0.98)
-  local height = math.floor(lines * 0.9)
-
-  -- Center position
-  local col = math.floor((columns - width) / 2)
-  local row = math.floor((lines - height) / 2 - 1)
+  -- 98% of one monitor, centered on the monitor holding the active window, so the float
+  -- never straddles the bezel. Resolved before the backdrop exists, while the current
+  -- window is still the user's.
+  local width, col = monitor.centered_width_col(0.98)
+  local height = math.floor(vim.o.lines * 0.9)
+  local row = math.floor((vim.o.lines - height) / 2 - 1)
 
   local backdrop_win = open_backdrop()
 
