@@ -33,9 +33,10 @@ require('config.opts')
 require('config.keymaps')
 require('config.urls')
 
--- Custom statusline and winbar.
+-- Custom statusline, winbar and tabline.
 require('config.statusline')
 require('config.winbar')
+require('config.tabline')
 require('config.recompile')
 require('config.notify')
 
