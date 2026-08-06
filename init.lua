@@ -39,8 +39,6 @@ require('config.winbar')
 require('config.recompile')
 require('config.notify')
 
-require('config.tabline')
-
 -- Do LSP setup in this order:
 --
 -- 1. Define common configuration

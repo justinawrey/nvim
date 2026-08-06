@@ -67,35 +67,6 @@ vim.api.nvim_set_hl(0, 'SignColumn', { bg = '#282828' })
 -- Virtual text diagnostics to the right of problematic lines.
 vim.diagnostic.config({ virtual_text = true })
 
-vim.api.nvim_create_user_command('Wc', function(opts)
-  local tabline = require('config.tabline')
-  if opts.args ~= '' then
-    local path = vim.fn.expand(opts.args)
-    for i, wt in ipairs(tabline.worktrees) do
-      if wt.path == path then
-        tabline.remove(i)
-        return
-      end
-    end
-  else
-    local current_tab = vim.api.nvim_get_current_tabpage()
-    for i, tp in ipairs(vim.api.nvim_list_tabpages()) do
-      if tp == current_tab then
-        tabline.remove(i)
-        return
-      end
-    end
-  end
-end, { nargs = '?' })
-
-vim.api.nvim_create_user_command('Wa', function(opts)
-  require('config.tabline').add(opts.args)
-end, { nargs = 1, complete = 'dir' })
-
-vim.api.nvim_create_user_command('Wcd', function(opts)
-  require('config.tabline').cd(opts.args)
-end, { nargs = 1, complete = 'dir' })
-
 -- Control line numbers and signcolumn based on buffer type.
 local no_number = { terminal = true, nofile = true, prompt = true }
 vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter', 'TermOpen' }, {

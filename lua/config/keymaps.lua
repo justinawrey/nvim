@@ -308,9 +308,9 @@ local function term_label(buf)
   return term_name(buf) or term_auto_label(buf)
 end
 
--- Find a window displaying `buf` anywhere across all tabpages (workspaces are just
--- tabpages -- see :Wa/:Wc/:Wcd). Prefers a window in the current tabpage so selecting a
--- terminal that's visible right here never yanks us to another workspace.
+-- Find a window displaying `buf` anywhere across all tabpages. Prefers a window in the
+-- current tabpage so selecting a terminal that's visible right here never yanks us to
+-- another tabpage.
 local function find_win_with_buf(buf)
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(vim.api.nvim_get_current_tabpage())) do
     if vim.api.nvim_win_get_buf(win) == buf then
@@ -413,15 +413,6 @@ end)
 --     end
 --   end
 -- end)
-
--- Clear the notification bullet on the current tab.
--- vim.keymap.set('n', '<leader>a', function()
---   local cwd = vim.fn.getcwd(-1, vim.fn.tabpagenr())
---   _G.clear_tab_attention(cwd)
---   _G.stop_tab_spinner(cwd)
--- end)
-
-vim.keymap.set('n', '<leader>wc', '<cmd>Wc<cr>')
 
 -- Open oil in cwd.
 vim.keymap.set('n', '<C-->', function()
