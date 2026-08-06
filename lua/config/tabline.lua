@@ -23,8 +23,6 @@ function _G.tabline()
         .. tabnr
         .. 'T'
         .. ' '
-        .. tabnr
-        .. ': '
         .. label(tabnr)
         .. ' '
     )
