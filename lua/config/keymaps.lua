@@ -344,6 +344,9 @@ vim.keymap.set('n', '<leader>st', function()
         return startswith(item.file, 'term://')
       end,
     },
+    -- Same compact styling as the <leader>u URL picker: no preview pane, input on top.
+    preview = 'none',
+    layout = { preset = 'vscode' },
     win = {
       input = {
         keys = {
@@ -351,12 +354,6 @@ vim.keymap.set('n', '<leader>st', function()
           -- default <c-q> sends the picker results to the quickfix list; just close instead
           ['<c-q>'] = { 'close', mode = { 'n', 'i' } },
           ['<c-d>'] = { 'bufdelete', mode = { 'n', 'i' } },
-        },
-      },
-      preview = {
-        wo = {
-          number = false,
-          signcolumn = 'no',
         },
       },
     },
