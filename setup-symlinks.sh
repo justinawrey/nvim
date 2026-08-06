@@ -63,6 +63,13 @@ case "$(uname -s)" in
 esac
 link "$REPO_DIR/lazygit.yml" "$lazygit_dst"
 
+# executables (~/.local/bin is prepended to PATH in ~/.zshrc)
+for exe in "$REPO_DIR"/bin/*; do
+  [[ -f "$exe" ]] || continue
+  [[ -x "$exe" ]] || chmod +x "$exe"
+  link "$exe" "$HOME/.local/bin/$(basename "$exe")"
+done
+
 if [[ "$changed" -eq 0 ]]; then
   printf '\nAll symlinks already correct.\n'
 else

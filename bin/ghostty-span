@@ -1,0 +1,47 @@
+#!/bin/bash
+# Span the frontmost Ghostty window across all external displays.
+read -r X Y W H SEAMS < <(swift - <<'SWIFT'
+import AppKit
+let main = NSScreen.screens.first { $0.frame.origin == .zero }!
+let ext = NSScreen.screens.filter { $0 !== main }
+let s = (ext.isEmpty ? [main] : ext).sorted { $0.frame.minX < $1.frame.minX }
+let minX = s.map { $0.frame.minX }.min()!
+let maxX = s.map { $0.frame.maxX }.max()!
+let minY = s.map { $0.visibleFrame.minY }.min()!
+let maxY = s.map { $0.visibleFrame.maxY }.max()!
+// Boundaries between horizontally adjacent displays. Arrangements often have a
+// small dead gap here; a window must straddle the seam before macOS will let it
+// grow onto the next display.
+let seams = zip(s, s.dropFirst()).map { Int(($0.frame.maxX + $1.frame.minX) / 2) }
+print(Int(minX), Int(main.frame.maxY - maxY), Int(maxX - minX), Int(maxY - minY),
+      seams.map(String.init).joined(separator: ","))
+SWIFT
+)
+
+se() { osascript -e "tell application \"System Events\" to tell process \"Ghostty\" to $1 front window$2"; }
+width() { se 'get size of' | awk -F', *' '{print $1}'; }
+
+osascript -e 'tell application "Ghostty" to activate'
+
+# Set the height first, while the window is still narrow enough to live on a
+# single display. Once it spans a seam macOS freezes its height, so this has to
+# happen before any widening.
+se "set position of" " to {$X, $Y}"          >/dev/null
+se "set size of"     " to {$(width), $H}"    >/dev/null
+
+# Walk the seams left to right, dragging the window across each one so it always
+# overlaps the display it is about to expand onto, then growing into it.
+IFS=, read -ra seam_list <<<"$SEAMS"
+for seam in "${seam_list[@]}"; do
+  [ -n "$seam" ] || continue
+  se "set position of" " to {$((seam - $(width) / 2)), $Y}" >/dev/null  # straddle seam
+  se "set size of"     " to {$W, $H}"                       >/dev/null  # grow right
+  se "set position of" " to {$X, $Y}"                       >/dev/null  # snap left edge back
+  se "set size of"     " to {$W, $H}"                       >/dev/null  # grow the rest
+done
+
+se "set position of" " to {$X, $Y}" >/dev/null
+se "set size of"     " to {$W, $H}" >/dev/null
+
+echo "target: ${W}x${H} @ $X,$Y"
+echo "actual: $(se 'get size of')  @ $(se 'get position of')"
