@@ -58,12 +58,53 @@
 ---
 --- It is recommended to use the same version of TypeScript in all packages, and therefore have it available in your workspace root. The location of the TypeScript binary will be determined automatically, but only once.
 
-local vue_plugin = {
-  name = '@vue/typescript-plugin',
-  location = '/opt/homebrew/Cellar/vue-language-server/3.2.2/libexec/lib/node_modules/@vue/language-server/node_modules',
-  languages = { 'vue' },
-  configNamespace = 'typescript',
-}
+-- Resolve `@vue/typescript-plugin` from wherever `vue-language-server` is installed.
+--
+-- The language servers live in their own npm prefix, outside of fnm, so that switching
+-- node versions (or `--use-on-cd` picking up a repo's .nvmrc) doesn't make them vanish:
+--
+--   npm --prefix ~/.local/lsp-servers i -g @vtsls/language-server \
+--     @vue/language-server vscode-langservers-extracted typescript@6
+--
+-- with `~/.local/lsp-servers/bin` appended to PATH in ~/.zshrc. The bins are
+-- `#!/usr/bin/env node`, so they still run under whatever node fnm has active.
+-- Derive the path rather than hardcoding it so upgrades don't break the config.
+local function vue_plugin_location()
+  local exe = vim.fn.exepath('vue-language-server')
+  if exe == '' then
+    return nil
+  end
+
+  -- .../lib/node_modules/@vue/language-server/bin/vue-language-server.js
+  local bin = vim.uv.fs_realpath(exe) or exe
+  -- .../lib/node_modules/@vue/language-server
+  local pkg_root = vim.fs.dirname(vim.fs.dirname(bin))
+  local location = pkg_root .. '/node_modules'
+
+  if vim.uv.fs_stat(location .. '/@vue/typescript-plugin') == nil then
+    return nil
+  end
+
+  return location
+end
+
+local location = vue_plugin_location()
+if not location then
+  vim.notify(
+    'Could not locate `@vue/typescript-plugin`. Install it with '
+      .. '`npm --prefix ~/.local/lsp-servers i -g @vue/language-server`.',
+    vim.log.levels.WARN
+  )
+end
+
+local vue_plugin = location
+    and {
+      name = '@vue/typescript-plugin',
+      location = location,
+      languages = { 'vue' },
+      configNamespace = 'typescript',
+    }
+  or nil
 
 vim.lsp.config['ts'] = {
   cmd = { 'vtsls', '--stdio' },
