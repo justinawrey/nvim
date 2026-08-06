@@ -308,6 +308,23 @@ local function term_label(buf)
   return term_name(buf) or term_auto_label(buf)
 end
 
+-- Find a window displaying `buf` anywhere across all tabpages (workspaces are just
+-- tabpages -- see :Wa/:Wc/:Wcd). Prefers a window in the current tabpage so selecting a
+-- terminal that's visible right here never yanks us to another workspace.
+local function find_win_with_buf(buf)
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(vim.api.nvim_get_current_tabpage())) do
+    if vim.api.nvim_win_get_buf(win) == buf then
+      return win
+    end
+  end
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
+      return win
+    end
+  end
+  return nil
+end
+
 vim.keymap.set('n', '<leader>st', function()
   local function startswith(str, prefix)
     return str:sub(1, #prefix) == prefix
@@ -344,6 +361,22 @@ vim.keymap.set('n', '<leader>st', function()
         return startswith(item.file, 'term://')
       end,
     },
+    -- If the terminal is already displayed in a window anywhere (any tabpage/workspace),
+    -- just focus that window -- switching tabpages if needed -- instead of opening another
+    -- copy of it here. Otherwise fall back to the picker's default open behaviour.
+    confirm = function(picker, item)
+      local win = item and item.buf and vim.api.nvim_buf_is_valid(item.buf) and find_win_with_buf(item.buf)
+      if not win then
+        -- default behaviour; jump closes the picker itself and needs an action spec
+        return Snacks.picker.actions.jump(picker, item, { cmd = 'edit' })
+      end
+      picker:close()
+      vim.schedule(function()
+        if vim.api.nvim_win_is_valid(win) then
+          vim.api.nvim_set_current_win(win)
+        end
+      end)
+    end,
     -- Same compact styling as the <leader>u URL picker: no preview pane, input on top.
     preview = 'none',
     layout = { preset = 'vscode' },
