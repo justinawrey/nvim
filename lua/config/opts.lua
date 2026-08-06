@@ -18,6 +18,15 @@ vim.opt.splitright = true
 -- Force horizontal split panes to split below.
 vim.opt.splitbelow = true
 
+-- Never auto-equalize windows. A split then divides only the window it came from
+-- (perfectly in half), and closing a window hands its space back to its sibling,
+-- so other panes keep their sizes no matter how splits are opened or closed.
+vim.opt.equalalways = false
+
+-- Don't auto-widen the window being entered (default is 20 columns, which steals
+-- space from neighbours and skews the halves above). Navigation no longer resizes.
+vim.opt.winwidth = 1
+
 -- Rounded diagnostic window borders that are easier to see.
 vim.opt.winborder = 'rounded'
 
@@ -51,8 +60,7 @@ vim.opt.laststatus = 3
 
 vim.cmd('colorscheme gruvbox')
 
-vim.api.nvim_set_hl(0, 'WinBar', { fg = '#a89984', bg = 'NONE' })
-vim.api.nvim_set_hl(0, 'WinBarNC', { fg = '#a89984', bg = 'NONE' })
+-- NOTE: WinBar/WinBarNC are set in config.winbar.
 -- Match signcolumn background to the editor background.
 vim.api.nvim_set_hl(0, 'SignColumn', { bg = '#282828' })
 

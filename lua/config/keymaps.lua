@@ -23,7 +23,8 @@ vim.api.nvim_create_user_command('Ht', function(args)
   vim.cmd('start')
 end, { nargs = '?' })
 
--- Default term
+-- Default term. Splits the current window in half without disturbing other
+-- panes -- that comes for free from 'noequalalways' (see config/opts.lua).
 vim.api.nvim_create_user_command('T', function(args)
   vim.cmd('Vt ' .. args.args)
 end, { nargs = '?' })
@@ -117,6 +118,20 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><Esc>')
 vim.keymap.set('t', 'jj', [[<C-\><C-n>]])
 vim.keymap.set('t', '<C-j>', '<Down>')
 vim.keymap.set('t', '<C-k>', '<Up>')
+
+-- Shift+Enter in nvim's :terminal -> insert a newline in the child app instead of
+-- submitting. Ghostty forwards shift+enter as a distinct <S-CR> (kitty keyboard
+-- protocol), but nvim's terminal (libvterm) can't re-encode that modifier for the
+-- child, so it collapses to a bare CR -- which Claude Code and other readline-style
+-- prompts read as "submit". Write the raw bytes ESC+CR straight to the pty instead:
+-- that's what Option/Alt+Enter emits, and Claude Code's input parser treats a CR
+-- prefixed with ESC as meta+return (a literal newline) with no /terminal-setup needed.
+vim.keymap.set('t', '<S-CR>', function()
+  local chan = vim.b.terminal_job_id
+  if chan then
+    vim.api.nvim_chan_send(chan, '\27\r')
+  end
+end, { desc = 'Terminal: Shift+Enter inserts a newline (e.g. Claude Code)' })
 
 -- Terminal-normal-mode <C-d>: exit shell + close buffer
 vim.keymap.set('n', '<C-d>', function()

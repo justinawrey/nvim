@@ -31,6 +31,58 @@ local function relative_path(from, to)
   return #rel > 0 and table.concat(rel, '/') or '.'
 end
 
+-- The winbar of the active window gets a light orange background so it's
+-- obvious which buffer has focus. Neovim already picks WinBar for the current
+-- window and WinBarNC for the others, but the embedded highlight groups
+-- (gitsigns, diagnostics) carry their own background, which would punch holes
+-- in the orange run. So for every group used inside the winbar we derive a
+-- <Group>WinBar variant that keeps the foreground and takes the orange
+-- background, and pick between the two depending on which window is drawing.
+local BG = '#7a4526'
+local FG = '#ebdbb2'
+
+local derived = {
+  'GitSignsAdd',
+  'GitSignsChange',
+  'GitSignsDelete',
+  'DiagnosticError',
+  'DiagnosticWarn',
+  'DiagnosticHint',
+  'DiagnosticInfo',
+}
+
+local function set_hl()
+  -- Active window: dark text on light orange. Inactive: unchanged.
+  vim.api.nvim_set_hl(0, 'WinBar', { fg = FG, bg = BG })
+  vim.api.nvim_set_hl(0, 'WinBarNC', { fg = '#a89984', bg = 'NONE' })
+
+  for _, name in ipairs(derived) do
+    local base = vim.api.nvim_get_hl(0, { name = name, link = false })
+    vim.api.nvim_set_hl(0, name .. 'WinBar', { fg = base.fg, bold = base.bold, bg = BG })
+  end
+end
+
+set_hl()
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  group = vim.api.nvim_create_augroup('config.winbar', { clear = true }),
+  callback = set_hl,
+})
+
+-- Is the window currently being rendered the focused one?
+local function active()
+  return vim.g.statusline_winid == vim.api.nvim_get_current_win()
+end
+
+-- '%#Group#' for the window being rendered.
+local function hl(name)
+  if name == nil then
+    return active() and '%#WinBar#' or '%#WinBarNC#'
+  end
+
+  return '%#' .. name .. (active() and 'WinBar' or '') .. '#'
+end
+
 --
 -- Get the path, relative to the git root, of the file
 -- open in the current buffer. If a parent git repo cannot
@@ -72,13 +124,13 @@ function _G.buffer_git_status()
   local parts = {}
 
   if added ~= nil and added > 0 then
-    table.insert(parts, '%#GitSignsAdd#' .. '+' .. added .. '%#WinBar#')
+    table.insert(parts, hl('GitSignsAdd') .. '+' .. added .. hl())
   end
   if changed ~= nil and changed > 0 then
-    table.insert(parts, '%#GitSignsChange#' .. '~' .. changed .. '%#WinBar#')
+    table.insert(parts, hl('GitSignsChange') .. '~' .. changed .. hl())
   end
   if removed ~= nil and removed > 0 then
-    table.insert(parts, '%#GitSignsDelete#' .. '-' .. removed .. '%#WinBar#')
+    table.insert(parts, hl('GitSignsDelete') .. '-' .. removed .. hl())
   end
 
   if #parts > 0 then
@@ -98,16 +150,16 @@ function _G.diagnostics_summary()
   local parts = {}
 
   if e > 0 then
-    table.insert(parts, '%#DiagnosticError#' .. e .. 'E' .. '%#WinBar#')
+    table.insert(parts, hl('DiagnosticError') .. e .. 'E' .. hl())
   end
   if w > 0 then
-    table.insert(parts, '%#DiagnosticWarn#' .. w .. 'W' .. '%#WinBar#')
+    table.insert(parts, hl('DiagnosticWarn') .. w .. 'W' .. hl())
   end
   if h > 0 then
-    table.insert(parts, '%#DiagnosticHint#' .. h .. 'H' .. '%#WinBar#')
+    table.insert(parts, hl('DiagnosticHint') .. h .. 'H' .. hl())
   end
   if i > 0 then
-    table.insert(parts, '%#DiagnosticInfo#' .. i .. 'I' .. '%#WinBar#')
+    table.insert(parts, hl('DiagnosticInfo') .. i .. 'I' .. hl())
   end
 
   return table.concat(parts, ' ')

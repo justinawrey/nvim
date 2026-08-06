@@ -31,6 +31,7 @@ require('config.plug.md')
 -- one-off key-val settings, not really any logic.
 require('config.opts')
 require('config.keymaps')
+require('config.urls')
 
 -- Custom statusline and winbar.
 require('config.statusline')
