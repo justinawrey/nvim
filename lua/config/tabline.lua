@@ -30,8 +30,9 @@ function _G.tabline()
     )
   end
 
+  -- '%=' pushes everything after it to the right, so the tabs are right aligned.
   -- '%T' ends the last clickable region, TabLineFill paints the leftover space.
-  return table.concat(parts) .. '%#TabLineFill#%T'
+  return '%#TabLineFill#%=' .. table.concat(parts) .. '%#TabLineFill#%T'
 end
 
 -- Always show the tabline, even with a single tab, so renaming is visible.
