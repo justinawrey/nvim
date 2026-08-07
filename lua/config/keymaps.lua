@@ -169,10 +169,6 @@ vim.keymap.set('n', '<leader>n', function()
   end)
 end)
 
--- lazygit: one persistent instance per worktree. <leader>lg opens or re-shows it; <C-q>
--- (inside lazygit) hides the window while leaving the process running. See config/lazygit.lua.
-vim.keymap.set('n', '<leader>lg', require('config.lazygit').open)
-
 -- notes mappings
 vim.keymap.set('n', '<leader>b', function()
   require('config.floating_win').open_floating_win('~/.config/daily/daily.md', 'notes')

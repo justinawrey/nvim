@@ -84,7 +84,7 @@ function M.open_floating_win_with_term(opts)
           opts.on_exit()
         end
         -- Close whatever window currently shows this terminal. The buffer may have been
-        -- reopened in a new window since spawn (e.g. a reused lazygit instance), so we
+        -- reopened in a new window since spawn (e.g. a reused terminal instance), so we
         -- can't rely on the window handle captured here, or a finished process would
         -- leave a dead window behind.
         for _, w in ipairs(vim.fn.win_findbuf(buf)) do

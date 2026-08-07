@@ -58,17 +58,6 @@ snacks.setup({
     main = { file = false },
     layout = { config = center_on_monitor },
   },
-  lazygit = {
-    enable = true,
-    -- configure = true,
-    -- config = {
-    --   git = {
-    --     paging = {
-    --       pager = 'delta --dark --paging=never',
-    --     },
-    --   },
-    -- },
-  },
 })
 
 return snacks

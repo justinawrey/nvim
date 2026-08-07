@@ -57,8 +57,8 @@ function M.open()
     -- (see config/keymaps.lua term_name/term_label).
     vim.b[result.buf].term_name = 'scratch'
     -- Hide (keeping the shell running) with <C-q>. Mapped in both terminal and normal
-    -- mode: unlike lazygit, the scratch terminal keeps the global jj escape, so you may
-    -- press <C-q> from either mode. Buffer-local, so it survives a re-show.
+    -- mode: the scratch terminal keeps the global jj escape, so you may press <C-q>
+    -- from either mode. Buffer-local, so it survives a re-show.
     vim.keymap.set({ 't', 'n' }, '<C-q>', M.hide, { buffer = result.buf })
   end
 end
