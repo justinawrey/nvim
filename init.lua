@@ -29,6 +29,7 @@ require('config.plug.md')
 
 -- Options and keymaps, a.k.a a bunch of
 -- one-off key-val settings, not really any logic.
+require('config.monitor')
 require('config.opts')
 require('config.keymaps')
 require('config.urls')
