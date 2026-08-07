@@ -1,0 +1,41 @@
+#!/bin/bash
+# Fill the frontmost Ghostty window across the single display it is currently on.
+
+se() { osascript -e "tell application \"System Events\" to tell process \"Ghostty\" to $1 front window$2"; }
+
+osascript -e 'tell application "Ghostty" to activate'
+
+# Current window origin, in the top-left-origin coordinate space that
+# System Events / Accessibility use.
+read -r WX WY < <(se 'get position of' | awk -F', *' '{print $1, $2}')
+
+read -r X Y W H < <(swift - "$WX" "$WY" <<'SWIFT'
+import AppKit
+let wx = Double(CommandLine.arguments[1])!
+let wy = Double(CommandLine.arguments[2])!
+let main = NSScreen.screens.first { $0.frame.origin == .zero }!
+// Convert the window origin into the bottom-left-origin space AppKit uses.
+let p = CGPoint(x: wx, y: main.frame.maxY - wy)
+// The screen containing the window origin, else the one whose frame is nearest.
+let screen = NSScreen.screens.first { $0.frame.contains(p) }
+  ?? NSScreen.screens.min { a, b in
+       func d(_ f: CGRect) -> Double {
+         let dx = max(f.minX - p.x, 0, p.x - f.maxX)
+         let dy = max(f.minY - p.y, 0, p.y - f.maxY)
+         return dx * dx + dy * dy
+       }
+       return d(a.frame) < d(b.frame)
+     }!
+let v = screen.visibleFrame
+print(Int(v.minX), Int(main.frame.maxY - v.maxY), Int(v.width), Int(v.height))
+SWIFT
+)
+
+se "set position of" " to {$X, $Y}" >/dev/null
+se "set size of"     " to {$W, $H}" >/dev/null
+# Repeat: moving can nudge the size and vice versa when a window hits a bound.
+se "set position of" " to {$X, $Y}" >/dev/null
+se "set size of"     " to {$W, $H}" >/dev/null
+
+echo "target: ${W}x${H} @ $X,$Y"
+echo "actual: $(se 'get size of')  @ $(se 'get position of')"
