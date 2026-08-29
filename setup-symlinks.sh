@@ -63,6 +63,9 @@ case "$(uname -s)" in
 esac
 link "$REPO_DIR/lazygit.yml" "$lazygit_dst"
 
+# pi global instructions (loaded from ~/.pi/agent/AGENTS.md at startup)
+link "$REPO_DIR/pi/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+
 # pi skills (pi scans ~/.pi/agent/skills at startup)
 for skill in "$REPO_DIR"/skills/*/; do
   [[ -d "$skill" ]] || continue
