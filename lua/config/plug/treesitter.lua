@@ -1,5 +1,14 @@
 local treesitter = require('nvim-treesitter')
 
+vim.filetype.add({
+  extension = {
+    cginc = 'hlsl',
+    compute = 'hlsl',
+    hlsl = 'hlsl',
+    hlsli = 'hlsl',
+  },
+})
+
 -- TODO: I suppose I just install add to this as I go?
 -- Table from file type pattern to treesitter lang id.
 -- As languages are installed, add them here!
@@ -14,6 +23,7 @@ local treesitter_langs = {
   typescript = 'typescript',
   vue = 'vue',
   markdown = 'markdown',
+  hlsl = 'hlsl',
 }
 
 treesitter.install(vim.tbl_values(treesitter_langs))
