@@ -17,7 +17,7 @@ local prettier_configs = {
 
 nonels.setup({
   sources = {
-    nonels.builtins.formatting.prettierd.with({
+    nonels.builtins.formatting.prettier.with({
       runtime_condition = function(params)
         return vim.fs.root(params.bufnr, prettier_configs) ~= nil
       end,
