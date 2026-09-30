@@ -19,8 +19,7 @@
 - Write the simplest possible solution to the question at hand.
 - Favor easy to understand, "stupid simple" code over fancy abstractions or
   clever one-liners.
-- Add JSDoc to every new function, explaining what it does and why, with
-  `@param` and `@returns` entries that include types.
-- Keep code linear when it reads clearly. Do not split it into many small helper
-  functions just to shorten a function or satisfy lint rules; longer, clear
-  functions are fine. Use targeted ESLint disables when needed.
+- Inline code used at only one call site instead of extracting it into a one-use
+  function, even when this makes the calling function long.
+- Assign awaited results to named local variables before accessing or comparing
+  them; do not parenthesize awaited expressions merely to save a line.
