@@ -20,6 +20,7 @@ local treesitter_langs = {
   yaml = 'yaml',
   html = 'html',
   javascript = 'javascript',
+  json = 'json',
   typescript = 'typescript',
   vue = 'vue',
   markdown = 'markdown',

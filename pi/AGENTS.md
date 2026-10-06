@@ -19,3 +19,8 @@
 - Write the simplest possible solution to the question at hand.
 - Favor easy to understand, "stupid simple" code over fancy abstractions or
   clever one-liners.
+- Add JSDoc to every new function, explaining what it does and why, with
+  `@param` and `@returns` entries that include types.
+- Keep code linear when it reads clearly. Do not split it into many small helper
+  functions just to shorten a function or satisfy lint rules; longer, clear
+  functions are fine. Use targeted ESLint disables when needed.
