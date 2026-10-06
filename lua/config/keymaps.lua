@@ -174,8 +174,24 @@ vim.keymap.set('n', '<leader>b', function()
   require('config.floating_win').open_floating_win('~/.config/daily/daily.md', 'notes')
 end)
 
--- Open oil in cwd of active buf.
-vim.keymap.set('n', '-', '<CMD>Oil --float<CR>')
+--- Open Oil relative to the focused buffer, querying terminal shells so cd is reflected.
+--- @returns {nil} Opens a floating browser, or reports an unavailable terminal cwd.
+local function open_oil_for_buffer()
+  local dir
+  if vim.bo.buftype == 'terminal' then
+    -- term:// names retain the starting directory, not the shell's current directory.
+    local command = { 'lsof', '-a', '-p', tostring(vim.b.terminal_job_pid), '-d', 'cwd', '-Fn' }
+    local result = vim.system(command, { text = true }):wait()
+    dir = (result.stdout or ''):match('\nn([^\n]+)')
+    if not dir then
+      vim.notify('Could not determine terminal cwd', vim.log.levels.WARN)
+      return
+    end
+  end
+  require('config.plug.oil').open_float(dir)
+end
+
+vim.keymap.set('n', '-', open_oil_for_buffer, { desc = 'Open Oil relative to the focused buffer' })
 
 -- Send a recompilation signal to a server
 -- that may or may not be listening.  Who knows!
