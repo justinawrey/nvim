@@ -17,6 +17,10 @@ vim.filetype.add({
 local treesitter_langs = {
   lua = 'lua',
   cs = 'c_sharp',
+  go = 'go',
+  gomod = 'gomod',
+  gowork = 'gowork',
+  gosum = 'gosum',
   yaml = 'yaml',
   html = 'html',
   javascript = 'javascript',

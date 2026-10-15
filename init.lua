@@ -49,6 +49,7 @@ require('config.notify')
 -- make sure to not double attach in config.lsp.attach.
 require('config.lsp.common')
 require('config.lsp.eslint')
+require('config.lsp.go')
 require('config.lsp.lua')
 require('config.lsp.md')
 require('config.lsp.ts')
