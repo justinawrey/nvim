@@ -103,6 +103,34 @@ vim.keymap.set('n', '<C-l>', '<C-w>l')
 vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', '<C-j>', '<C-w>j')
 
+-- Move this buffer into the neighbouring pane, then close its old pane.
+for _, direction in ipairs({ 'h', 'j', 'k', 'l' }) do
+  vim.keymap.set({ 'n', 't' }, '<C-D-' .. direction .. '>', function()
+    local source = vim.api.nvim_get_current_win()
+    local target = vim.fn.win_getid(vim.fn.winnr(direction))
+    if target == source then
+      return
+    end
+
+    local buf = vim.api.nvim_get_current_buf()
+    local view = vim.fn.winsaveview()
+    local terminal_mode = vim.fn.mode() == 't'
+    local displaced = vim.api.nvim_win_get_buf(target)
+    local bufhidden = vim.bo[displaced].bufhidden
+
+    -- Keep even wipe-on-hide buffers and their unsaved edits/jobs alive.
+    vim.bo[displaced].bufhidden = 'hide'
+    vim.api.nvim_win_set_buf(target, buf)
+    vim.bo[displaced].bufhidden = bufhidden
+    vim.api.nvim_set_current_win(target)
+    vim.api.nvim_win_close(source, false)
+    vim.fn.winrestview(view)
+    if terminal_mode then
+      vim.cmd('startinsert')
+    end
+  end, { desc = 'Move buffer into pane ' .. direction })
+end
+
 -- Navigate between tabs.
 vim.keymap.set('n', '<C-1>', '<CMD>tabn 1<CR>')
 vim.keymap.set('n', '<C-2>', '<CMD>tabn 2<CR>')

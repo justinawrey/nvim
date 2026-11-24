@@ -17,6 +17,7 @@
 - No defensive programming or unnecessary invariant checking. Trust inputs
   unless the task is explicitly about validation.
 - Write the simplest possible solution to the question at hand.
+- Favor early returns over continuous nesting when possible.
 - Favor easy to understand, "stupid simple" code over fancy abstractions or
   clever one-liners.
 - Inline code used at only one call site instead of extracting it into a one-use

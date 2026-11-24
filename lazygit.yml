@@ -4,6 +4,6 @@ gui:
   expandFocusedSidePanel: true
   expandedSidePanelWeight: 2
 git:
-  pagers:
-    - pager: delta --paging=never --side-by-side --line-numbers-left-format="" --line-numbers-right-format=""
-    - pager: delta --paging=never
+  diffRenderers:
+    - command: delta --paging=never --side-by-side --line-numbers-left-format="" --line-numbers-right-format=""
+    - command: delta --paging=never
